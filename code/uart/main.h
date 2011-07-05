@@ -12,5 +12,8 @@
 
 #define SYSCLK  16000000
 
+#define TRUE 1
+#define FALSE 0
+
 
 #endif 

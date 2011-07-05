@@ -17,6 +17,13 @@ int main(void)
     InitUART();
 	sei(); 		//enable global interapt 
 	
+	PrintEndl() ;
+	PrintEndl() ;
+	PrintEndl() ;
+	PrintString("FLYING MOSQUITO IS ON.") ;    
+    PrintEndl() ;
+	PrintEndl() ;
+			
 	LED_OFF(6);
 	LED_OFF(5);
 	LED_OFF(4);
@@ -25,25 +32,18 @@ int main(void)
 	DDRB |= (1<<4);
 	while (1)
 	{
+		LED_ON(6);
+		_delay_ms(400);
+		LED_OFF(6);
+		
+		LED_ON(5);
+		_delay_ms(400);
+		LED_OFF(5);
+		
+		LED_ON(4);
+		_delay_ms(400);
+		LED_OFF(4);
+		
 	}
-	/*{
-	//LED_ON(6);
-	while (! (UCSR1A & (1<<UDRE1)));
-	UDR1 = 'E';
-	while (! (UCSR1A & (1<<UDRE1)));
-	UDR1 = 'L';
-	while (! (UCSR1A & (1<<UDRE1)));
-	UDR1 = 'A';
-	while (! (UCSR1A & (1<<UDRE1)));
-	UDR1 = 'D';
-	while (! (UCSR1A & (1<<UDRE1)));
-	UDR1 = ' ';
-	char c;
-	while (! (UCSR1A & (1<<RXC1)));
-	c = UDR1;
-	while (! (UCSR1A & (1<<UDRE1)));
-	UDR1 = c+1;
-	}
-*/
 }
 
