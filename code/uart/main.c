@@ -15,6 +15,7 @@ int main(void)
 {
 	CPU_PRESCALE(0); // use the 16 MHz clk
     InitUART();
+	InitTimer0();
 	sei(); 		//enable global interapt 
 	
 	PrintEndl() ;
