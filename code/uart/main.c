@@ -31,20 +31,16 @@ int main(void)
     DDRB |= (1<<6);
 	DDRB |= (1<<5);
 	DDRB |= (1<<4);
+	uint16_t prevTime=0,currentTime;
 	while (1)
 	{
-		LED_ON(6);
-		_delay_ms(400);
-		LED_OFF(6);
-		
-		LED_ON(5);
-		_delay_ms(400);
-		LED_OFF(5);
-		
-		LED_ON(4);
-		_delay_ms(400);
-		LED_OFF(4);
-		
+		currentTime = GetMillis();
+		if ((currentTime - prevTime > 1000) || (currentTime < prevTime ))
+		{
+			prevTime = currentTime;
+			PORTB =~PORTB;
+		}
+
 	}
 }
 

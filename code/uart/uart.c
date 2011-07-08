@@ -242,26 +242,6 @@ void HendelNewCommand(void)
         }        
     }
 	
-	if (strcmp(operands[0],"time") ==0)
-    {
-        uint16_t t1 = GetTimeelad();
-        PrintString("T1 is") ;    
-		PrintInt(t1);  
-        PrintEndl() ;   
-		PrintString("TCNT0") ;    
-		PrintInt(TCNT0);  
-        PrintEndl() ;
-        _delay_ms(500);
-		int16_t t2 = GetTimeelad();
-        PrintString("T2 is") ;    
-		PrintInt(t2);  
-        PrintEndl() ;   
-		PrintString("TCNT0") ;    
-		PrintInt(TCNT0);  
-        PrintEndl() ;   
-		
-		
-    }
 	
 }
 
