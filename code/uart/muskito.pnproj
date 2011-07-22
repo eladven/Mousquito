@@ -1,1 +1,1 @@
-<Project name="muskito"><File path="uart.c"></File><File path="uart.h"></File><File path="Makefile"></File><File path="main.c"></File><File path="main.h"></File><File path="timer0.c"></File></Project>
+<Project name="muskito"><File path="uart.c"></File><File path="uart.h"></File><File path="Makefile"></File><File path="main.c"></File><File path="main.h"></File><File path="timer0.c"></File><File path="math.h"></File><File path="angleEstimation.c"></File><File path="angleEstimation.h"></File><File path="math.c"></File><File path="timer0.h"></File></Project>

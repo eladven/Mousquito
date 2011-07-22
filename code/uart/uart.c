@@ -1,7 +1,11 @@
 #include <avr/io.h>
+#include <string.h>
 
 #include "main.h"
 #include "uart.h"
+#include "math.h"
+#include "timer0.h"
+
 
 
 // local variables for this modul:
@@ -11,6 +15,9 @@ uint8_t   TransmitBuff [BUFF_LENGTH];
 uint8_t   TransmitBuffIndex = 1;  
 uint8_t   ReciveBuffIndex = 0;  
 
+
+int16_t intsqt = -1;  //this variables use for transmit data  between SyncOut and HndelData. their value isthe 
+float sqt = -1;       // incoming argument, -1 means that it is not in use
 
 
 // local functions  for this modul:
@@ -241,6 +248,48 @@ void HendelNewCommand(void)
             }  
         }        
     }
+	
+	if (strcmp(operands[0],"intsqrt") ==0)
+    {
+        int tmp=-1;
+        sscanf(operands[1],"%d",&tmp);   
+        intsqt = tmp;
+    }
+	
+	
+}
+
+
+//******************************************************************************************//
+// this function is calld by the main periodicly. it perpuse is to handel all the data
+// that the program shold plot out periodicly.
+//******************************************************************************************//
+
+void SyncOut(void)
+{
+    static int i=0;
+	PrintString("Inside syncout ");
+	PrintInt(i++);
+	PrintEndl();
+	if (intsqt != - 1 )  //calculate and print int sqrt
+	{
+		PrintString("calculate int sqt: ");
+		PrintInt(intsqt);
+		PrintEndl();
+		uint16_t t1 = GetMillis();
+		intsqt = int_sqrt(intsqt);
+		uint16_t t2 = GetMillis();
+		PrintString("Ans ");
+		PrintInt(intsqt);
+		PrintEndl();
+		PrintString("Start time ");
+		PrintInt(t1);
+		PrintString(" end time ");
+		PrintInt(t2);
+		PrintEndl();
+		
+		intsqt = - 1 ;
+	}
 	
 	
 }

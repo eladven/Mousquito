@@ -1,9 +1,11 @@
 #include "main.h"
 #include "timer0.h"
+#include "math.h"
 
 uint8_t counter=0;  // time [100 usec]
 uint16_t millis = 0;
 uint16_t sec    = 0;
+uint8_t phase = 0;
 
 void InitTimer0(void)
 {
@@ -35,8 +37,19 @@ uint16_t GetSecs(void) //returns time [100 usec]
 	return sec; 
 }
 
-ISR(TIMER0_COMPA_vect)  //evry 10 kHz
+
+
+
+uint8_t GetPhase(void)
+{
+	return phase;
+}
+
+ISR(TIMER0_COMPA_vect)//TIMER0_COMPA_vect)  //evry 10 kHz
 { 
+	static uint16_t cnt = 0;
+
+	cnt++;
 	counter ++;
 	if (counter == 10)
 	{
@@ -47,6 +60,14 @@ ISR(TIMER0_COMPA_vect)  //evry 10 kHz
 	{
 		millis = 0;
 		sec++;
+	}
+	if (cnt == SYNC_PERIOD)
+	{
+		cnt = 0;
+		if (phase)   //tugel the phase every SYNC_PERIOD
+			phase = 0;
+		else
+		    phase = 1;
 	}
 }
 

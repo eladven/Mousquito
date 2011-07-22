@@ -20,7 +20,7 @@ int  PrintChar(char c);
 int  PrintString(char *st);
 int  PrintEndl(void);
 int  PrintInt(int  num);
-
+void SyncOut(void); // plot data periodicly.
 
 
 

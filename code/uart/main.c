@@ -1,21 +1,28 @@
 #include "main.h"
+#include "uart.h"
+#include "timer0.h"
+#include "angleEstimation.h"
 
 
-
-
-#define LED_ON(n)		(PORTB |= (1<<n))
-#define LED_OFF(n)		(PORTB &= ~(1<<n))
-
-
-
-
-
+void InitLeds(void)
+{
+	DDRB |= (1<<6);
+	DDRB |= (1<<5);
+	DDRB |= (1<<4);
+	PORTB = 0;
+}
 
 int main(void)
 {
 	CPU_PRESCALE(0); // use the 16 MHz clk
     InitUART();
 	InitTimer0();
+	InitLeds();
+	
+	// disable watchdog
+    MCUSR &=~(1<<WDRF);
+    WDTCSR |= (1<<WDCE)|(1<<WDE);
+    WDTCSR = 0;
 	sei(); 		//enable global interapt 
 	
 	PrintEndl() ;
@@ -24,23 +31,19 @@ int main(void)
 	PrintString("FLYING MOSQUITO IS ON.") ;    
     PrintEndl() ;
 	PrintEndl() ;
-			
-	LED_OFF(6);
-	LED_OFF(5);
-	LED_OFF(4);
-    DDRB |= (1<<6);
-	DDRB |= (1<<5);
-	DDRB |= (1<<4);
-	uint16_t prevTime=0,currentTime;
-	while (1)
-	{
-		currentTime = GetMillis();
-		if ((currentTime - prevTime > 1000) || (currentTime < prevTime ))
-		{
-			prevTime = currentTime;
-			PORTB =~PORTB;
-		}
+	
 
+	uint8_t prevPhase=0;
+	while (1)   // infinit loop 
+	{
+	    uint8_t currentPase = GetPhase();
+		if  ( currentPase != prevPhase  )  //if the phase have just changed
+		{
+			prevPhase = currentPase;
+			runEstimator();
+			SyncOut();
+		}
 	}
+	return 1;
 }
 

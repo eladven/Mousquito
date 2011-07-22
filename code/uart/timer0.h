@@ -13,6 +13,7 @@ void InitTimer0(void);
 uint16_t GetMicros(void); //returns time [100 usec]
 uint16_t GetMillis(void); //returns time [ msec]
 uint16_t GetSecs(void); //returns time [sec]
+uint8_t GetPhase(void); // the phase is change from 0 to 1 and from 1 to 0 (tugle) every SYNC_PERIOD
 
 
 #endif 

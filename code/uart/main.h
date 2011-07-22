@@ -15,5 +15,11 @@
 #define TRUE 1
 #define FALSE 0
 
+extern uint8_t FullPeriod;
+
+
+
+#define LED_ON(n)		(PORTB |= (1<<n))
+#define LED_OFF(n)		(PORTB &= ~(1<<n))
 
 #endif 
