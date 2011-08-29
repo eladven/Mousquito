@@ -256,6 +256,13 @@ void HendelNewCommand(void)
         intsqt = tmp;
     }
 	
+	if (strcmp(operands[0],"sqrt") ==0)
+    {
+        int tmp=-1;
+        sscanf(operands[1],"%d",&tmp);   
+        intsqt = tmp;
+    }
+	
 	
 }
 
@@ -267,29 +274,6 @@ void HendelNewCommand(void)
 
 void SyncOut(void)
 {
-    static int i=0;
-	PrintString("Inside syncout ");
-	PrintInt(i++);
-	PrintEndl();
-	if (intsqt != - 1 )  //calculate and print int sqrt
-	{
-		PrintString("calculate int sqt: ");
-		PrintInt(intsqt);
-		PrintEndl();
-		uint16_t t1 = GetMillis();
-		intsqt = int_sqrt(intsqt);
-		uint16_t t2 = GetMillis();
-		PrintString("Ans ");
-		PrintInt(intsqt);
-		PrintEndl();
-		PrintString("Start time ");
-		PrintInt(t1);
-		PrintString(" end time ");
-		PrintInt(t2);
-		PrintEndl();
-		
-		intsqt = - 1 ;
-	}
 	
 	
 }
