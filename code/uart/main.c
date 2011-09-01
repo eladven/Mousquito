@@ -5,6 +5,7 @@
 #include "i2c.h"
 
 
+
 void InitLeds(void)
 {
 	DDRB |= (1<<6);
@@ -14,8 +15,6 @@ void InitLeds(void)
 }
 
 
-unsigned char messageBuf[8];
-unsigned char TWI_targetSlaveAddress;
 	
 int main(void)
 {
@@ -33,9 +32,10 @@ int main(void)
 
 	sei(); 		//enable global interapt 
 	
+	InitIMU(); // use i2c, thus must be after sei instruction.
 	
 	
-	
+	volatile int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
 	
 	uint8_t prevPhase=0;
 	while (1)   // infinit loop 
@@ -76,30 +76,17 @@ int main(void)
 			//printChar(messageBuf);
 			*/
 			/// code for accelometer
-			TWI_targetSlaveAddress = TWI_accelerometerAdd;
-	
-			messageBuf[0] = (TWI_targetSlaveAddress<<1) | (TWI_WRITE); // The first byte must always consit of General Call code or the TWI slave address.
-			messageBuf[1] = 0x02;
-			TWI_Start_Read_Write( messageBuf, 2 );
-	
-			messageBuf[0] = (TWI_targetSlaveAddress<<TWI_ADR_BITS) | (TWI_READ); // The first byte must always consit of General Call code or the TWI slave address.
-			TWI_Start_Read_Write( messageBuf,7);
-
-	
-			TWI_Read_Data_From_Buffer(messageBuf, 7 );
-			PrintString("messageBuf - after reading  ");
-			int8_t x,y,z;
-			x = (~(messageBuf[1] *256 + messageBuf[2]) + 1) & 0x03FF;
-			y = (~(messageBuf[3] *256 + messageBuf[4]) + 1) & 0x03FF;
-			z = (~(messageBuf[5] *256 + messageBuf[6]) + 1) & 0x03FF;
-			PrintInt(x);
-			PrintString("  ");
-			PrintInt(y);
-			PrintString("  ");
-			PrintInt(z);
-			PrintEndl();
 			
 			
+			GetIMUData(IMUData);
+			
+			PrintString("IMU DATA  ");
+			PrintInt(IMUData[0]);
+ 			PrintString("  ");
+			PrintInt(IMUData[1]);
+ 			PrintString("  ");
+			PrintInt(IMUData[2]);
+ 			PrintEndl();
 	
 		}
 		LED_OFF(4);	

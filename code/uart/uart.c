@@ -278,7 +278,3 @@ void SyncOut(void)
 	
 }
 
-
-
-
-
