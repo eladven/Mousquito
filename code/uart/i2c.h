@@ -88,7 +88,7 @@ Note: 3 lsbs are for prescale value and should be masked out. (12/2 -jkl)
 // Slaves Sensors Address
 #define TWI_magnetometerAdd 0x0C
 #define TWI_accelerometerAdd 0x38
-#define TWI_gyroscopeAdd 0x34
+#define TWI_gyroscopeAdd 0x68
 
 
 

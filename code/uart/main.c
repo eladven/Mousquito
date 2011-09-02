@@ -81,11 +81,18 @@ int main(void)
 			GetIMUData(IMUData);
 			
 			PrintString("IMU DATA  ");
+			PrintString("Acc  ");
 			PrintInt(IMUData[0]);
  			PrintString("  ");
 			PrintInt(IMUData[1]);
  			PrintString("  ");
 			PrintInt(IMUData[2]);
+			PrintString("  Gyro  ");
+			PrintInt(IMUData[3]);
+ 			PrintString("  ");
+			PrintInt(IMUData[4]);
+ 			PrintString("  ");
+			PrintInt(IMUData[5]);
  			PrintEndl();
 	
 		}
