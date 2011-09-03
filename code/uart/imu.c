@@ -2,6 +2,11 @@
 #include "main.h"
 #include "imu.h"
 #include "i2c.h"
+#include "uart.h"
+
+static int16_t  IMUDataBias[6]; 
+
+
 void InitIMU(void)
 { 
 	unsigned char messageBuf[8];
@@ -30,6 +35,8 @@ void InitIMU(void)
 	messageBuf[1] = 0x16; 
 	messageBuf[2] = 0x18;  
 	TWI_Start_Read_Write( messageBuf, 3 );	
+	
+	GetIMUDataBias();
 }
 
 void GetIMUData(int16_t *IMUData)
@@ -66,6 +73,70 @@ void GetIMUData(int16_t *IMUData)
 	IMUData[4] =   (messageBuf[3] << 8 ) | messageBuf[4] ; 
 	IMUData[5] =   (messageBuf[5] << 8 ) | messageBuf[6] ; 
 	
+	
+	// read from magneto.
+	
+	messageBuf[0] = (TWI_magnetometerAdd<<1) | (TWI_WRITE); //first  , write the reg add that we want to read from
+	messageBuf[1] = 0x02; 
+	TWI_Start_Read_Write( messageBuf,2); // one for sla+w + reg add+ reg data
+	
+	messageBuf[0] = (TWI_magnetometerAdd<<TWI_ADR_BITS) | (TWI_READ); // second , do the reading.
+	TWI_Start_Read_Write( messageBuf,8); // one for sla+rw + status + 2 x 3 regs
+	
+	TWI_Read_Data_From_Buffer(messageBuf, 8 );
+	
+	if (messageBuf[1] == 0x01) {  //take the data only if the data is redy
+		IMUData[6] =   (messageBuf[3] << 8 ) | messageBuf[2] ; // two's compliment of gyroX[msb](hx[7:0]) # accX[lsb](hx[7:6])
+		IMUData[7] =   (messageBuf[5] << 8 ) | messageBuf[4] ; 
+		IMUData[8] =   (messageBuf[7] << 8 ) | messageBuf[6] ; 
+	}
+	
+	messageBuf[0] = (TWI_magnetometerAdd<<1) | (TWI_WRITE); // for next step: change magneto mode to single messurment
+	messageBuf[1] = 0x0A;  	
+	messageBuf[2] = 0x01;  	
+	TWI_Start_Read_Write( messageBuf,3); // one for sla+w + reg add+ reg data
+	
+	// subtract the bias from acc and gyro:
+	for (int j=0; j<6; j++)
+	{
+		IMUData[j]=IMUData[j] - IMUDataBias[j];
+	}
+}
+
+
+void  GetIMUDataBias()
+{
+ 
+	PrintString("calibrating IMU system.");
+ 	PrintEndl();
+	PrintString("The system must be stand still and horizontaly.");
+	PrintEndl();
+	PrintString("calibrate: ");
+	int16_t tempIMUData[9];
+	int16_t tempIMUDataBias[6];
+	for (int j=0; j<6; j++)
+	{
+		 tempIMUDataBias[j]=0;
+		 IMUDataBias[j]=0;
+	}
+	for (int i=0; i<10; i++)
+	{
+		GetIMUData(tempIMUData);
+		for (int j=0; j<6; j++)
+		{   
+			tempIMUDataBias[j] = tempIMUDataBias[j] + tempIMUData[j];
+		}
+		_delay_ms(100);
+		PrintString(".");
+	}
+	for (int j=0; j<6; j++)
+	{
+		IMUDataBias[j]=tempIMUDataBias[j]/10;
+	}
+	IMUDataBias[2] -=256; //need to feal the gravity
+	
+	PrintString("The system is calibrated.");
+ 	PrintEndl();
 }
 
 

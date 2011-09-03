@@ -85,10 +85,6 @@ Note: 3 lsbs are for prescale value and should be masked out. (12/2 -jkl)
 #define TWI_NO_STATE 0xF8 // No relevant state information available; TWINT =  0 
 #define TWI_BUS_ERROR 0x00 // Bus error due to an illegal START or STOP condition
 
-// Slaves Sensors Address
-#define TWI_magnetometerAdd 0x0C
-#define TWI_accelerometerAdd 0x38
-#define TWI_gyroscopeAdd 0x68
 
 
 

@@ -272,9 +272,28 @@ void HendelNewCommand(void)
 // that the program shold plot out periodicly.
 //******************************************************************************************//
 
-void SyncOut(void)
+void SyncOut(int16_t * IMUData)
 {
-	
+	PrintString("IMU DATA  ");
+	PrintString("Acc  ");
+	PrintInt(IMUData[0]);
+ 	PrintString("  ");
+	PrintInt(IMUData[1]);
+ 	PrintString("  ");
+	PrintInt(IMUData[2]);
+	PrintString("  Gyro  ");
+	PrintInt(IMUData[3]);
+ 	PrintString("  ");
+	PrintInt(IMUData[4]);
+ 	PrintString("  ");
+	PrintInt(IMUData[5]);
+	PrintString("  Magno   ");
+	PrintInt(IMUData[6]);
+ 	PrintString("  ");
+	PrintInt(IMUData[7]);
+ 	PrintString("  ");
+	PrintInt(IMUData[8]);
+ 	PrintEndl();
 	
 }
 
