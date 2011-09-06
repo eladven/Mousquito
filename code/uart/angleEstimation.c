@@ -4,6 +4,33 @@
 #include "timer0.h"
 #include "math.h"
 
+void SpiritLevelEstimator(int16_t *IMUData,double *angle)
+{
+	double c0=IMUData[0],c1=IMUData[1],c2=IMUData[2];
+	angle[1] = atan2(c1,c2);
+	angle[0] = atan2(c0,sqrt(c1*c1+c2*c2));
+		PrintString("sfsdfsdf  ");
+		//PrintInt(IMUData[1]);
+		//PrintString("  ");
+		PrintInt((angle[0]*180)/3.14);
+		PrintString("  ");
+		PrintInt((angle[1]*180)/3.14);
+		PrintEndl();
+}
+
+
+void SpiritLevelEstimator2(int16_t *IMUData,double *angle)
+{
+	double c0=IMUData[0],c1=IMUData[1],c2=IMUData[2];
+	angle[1] = c_atan2(c1=IMUData[1], c1=IMUData[2]);
+	angle[0] = c_atan2(c0,sqrt(c1*c1+c2*c2));
+		PrintString("sfsdfsdf  ");
+		PrintInt(angle[0]);
+		PrintString("  ");
+		PrintInt(angle[1]);
+		PrintEndl();
+}
+
 #define dt 1/SYNC_PERIOD
 #define x 0
 #define y 1

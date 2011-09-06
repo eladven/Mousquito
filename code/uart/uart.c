@@ -272,28 +272,43 @@ void HendelNewCommand(void)
 // that the program shold plot out periodicly.
 //******************************************************************************************//
 
-void SyncOut(int16_t * IMUData)
+void SyncOut(int16_t *IMUData,double *angle)
 {
-	PrintString("IMU DATA  ");
-	PrintString("Acc  ");
-	PrintInt(IMUData[0]);
- 	PrintString("  ");
-	PrintInt(IMUData[1]);
- 	PrintString("  ");
-	PrintInt(IMUData[2]);
-	PrintString("  Gyro  ");
-	PrintInt(IMUData[3]);
- 	PrintString("  ");
-	PrintInt(IMUData[4]);
- 	PrintString("  ");
-	PrintInt(IMUData[5]);
-	PrintString("  Magno   ");
-	PrintInt(IMUData[6]);
- 	PrintString("  ");
-	PrintInt(IMUData[7]);
- 	PrintString("  ");
-	PrintInt(IMUData[8]);
- 	PrintEndl();
-	
+	static int16_t prevMillis = 0;
+	int16_t millis = GetMillis();
+	if ( (millis - prevMillis) < 0)
+		prevMillis = prevMillis - 1000;
+	if ( (millis - prevMillis) > 100)
+	{
+		prevMillis = millis;
+		/*PrintString("IMU DATA  ");
+		PrintString("Acc  ");
+		PrintInt(IMUData[0]);
+		PrintString("  ");
+		PrintInt(IMUData[1]);
+		PrintString("  ");
+		PrintInt(IMUData[2]);
+		PrintString("  Gyro  ");
+		PrintInt(IMUData[3]);
+		PrintString("  ");
+		PrintInt(IMUData[4]);
+		PrintString("  ");
+		PrintInt(IMUData[5]);
+		PrintString("  Magno   ");
+		PrintInt(IMUData[6]);
+		PrintString("  ");
+		PrintInt(IMUData[7]);
+		PrintString("  ");
+		PrintInt(IMUData[8]);
+		PrintEndl();*/
+		
+	/*	PrintString("ANGLE  ");
+		PrintInt((angle[0]*180)/3.14);
+		PrintString("  ");
+		PrintInt((angle[1]*180)/3.14);
+		PrintString("  ");
+		PrintInt((angle[2]*180)/3.14);
+		PrintEndl();*/
+	}
 }
 

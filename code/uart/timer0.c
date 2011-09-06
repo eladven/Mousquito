@@ -5,7 +5,7 @@
 uint8_t counter=0;  // time [100 usec]
 uint16_t millis = 0;
 uint16_t sec    = 0;
-uint8_t phase = 0;
+static uint8_t phase = 0;
 
 void InitTimer0(void)
 {
@@ -40,9 +40,15 @@ uint16_t GetSecs(void) //returns time [100 usec]
 
 
 
-uint8_t GetPhase(void)
+uint8_t IsNewPeriod(void)
 {
-	return phase;
+	static uint8_t internalPhase = 0;
+	if (phase != internalPhase)
+	{
+		internalPhase = phase;
+		return TRUE;
+	}
+	return FALSE;
 }
 
 ISR(TIMER0_COMPA_vect)//TIMER0_COMPA_vect)  //evry 10 kHz

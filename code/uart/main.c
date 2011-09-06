@@ -3,7 +3,7 @@
 #include "timer0.h"
 #include "angleEstimation.h"
 #include "i2c.h"
-
+#include "imu.h"
 
 
 void InitLeds(void)
@@ -38,19 +38,26 @@ int main(void)
 	InitIMU(); // use i2c, thus must be after sei instruction.
 	
 	int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
+	double  angle[3];  //pitch,roll,yaw
 	
-	uint8_t prevPhase=0;
 	while (1)   // infinit loop 
 	{
-	    uint8_t currentPase = GetPhase();
-		if  ( currentPase != prevPhase  )  //if the phase have just changed
+		int16_t t1,t2;
+		
+		if  (IsNewPeriod())  //if the phase have just changed
 		{
-			prevPhase = currentPase;
+		t1= GetMillis();
 			LED_ON(4);
-			_delay_ms(200);
-			GetIMUData(IMUData);
-			//	runEstimator();
-			SyncOut(IMUData);		
+			GetIMUData(IMUData);  // 3 ms
+			SpiritLevelEstimator2(IMUData,angle);
+			SyncOut(IMUData,angle);		
+			t2= GetMillis();
+				PrintString("time  ");
+		PrintInt(t1);
+		PrintString("  ");
+		PrintInt(t2);
+		PrintEndl();
+		_delay_ms(1000);
 		}
 		LED_OFF(4);	
 	}

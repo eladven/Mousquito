@@ -20,7 +20,7 @@ int  PrintChar(char c);
 int  PrintString(char *st);
 int  PrintEndl(void);
 int  PrintInt(int  num);
-void SyncOut(int16_t * IMUData); // plot data periodicly.
+void SyncOut(int16_t *IMUData,double *angle); // plot data periodicly.
 
 
 
