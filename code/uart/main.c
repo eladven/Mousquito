@@ -46,18 +46,19 @@ int main(void)
 		
 		if  (IsNewPeriod())  //if the phase have just changed
 		{
-		t1= GetMillis();
+		    t1= GetMillis();
 			LED_ON(4);
 			GetIMUData(IMUData);  // 3 ms
-			SpiritLevelEstimator2(IMUData,angle);
+			GyroEstimator2(IMUData,angle);
+			//SpiritLevelEstimator(IMUData,angle);
 			SyncOut(IMUData,angle);		
-			t2= GetMillis();
+			/*t2= GetMillis();
 				PrintString("time  ");
 		PrintInt(t1);
 		PrintString("  ");
 		PrintInt(t2);
 		PrintEndl();
-		_delay_ms(1000);
+		_delay_ms(1000);*/
 		}
 		LED_OFF(4);	
 	}

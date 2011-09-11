@@ -301,14 +301,30 @@ void SyncOut(int16_t *IMUData,double *angle)
 		PrintString("  ");
 		PrintInt(IMUData[8]);
 		PrintEndl();*/
-		
-	/*	PrintString("ANGLE  ");
+		/*
+		PrintString("angle ");
 		PrintInt((angle[0]*180)/3.14);
 		PrintString("  ");
 		PrintInt((angle[1]*180)/3.14);
 		PrintString("  ");
 		PrintInt((angle[2]*180)/3.14);
-		PrintEndl();*/
+		PrintEndl();
+		*/
+		/*
+		unsigned  char p = 100+(angle[0]*180)/3.14,t = 100+(angle[1]*180)/3.14,ps = 100+(angle[2]*180)/3.14;
+		
+		PrintChar('A');
+		PrintChar(p);
+		PrintChar(t);
+		PrintChar(ps);
+		PrintChar('Z');
+	
+		*/
+		unsigned  char p = 100+(angle[0]*180)/3.14,t = 100+(angle[1]*180)/3.14,ps = 100+(angle[2]*180)/3.14;
+		PrintChar(p);
+		PrintChar(t);
+		PrintChar(ps);
+		PrintChar('\n');
 	}
 }
 
