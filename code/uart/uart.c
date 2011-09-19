@@ -192,6 +192,40 @@ int  PrintInt(int  num)
 }
 
 
+//**************************************************************
+//  this function use fot print integers. it take int16_t and convert it to 3 chars
+//**************************************************************
+int  PrintArray(int16_t *num)
+{    
+    if( (TransmitBuffIndex + 32) > BUFF_LENGTH) //if the buffer is  full return 0.
+    {
+        return 0;
+    }
+    int i =0;
+    for (i=0; TransmitBuff[i];i++); // find the buffers edge 
+	for (int j=0;j<4;j++) //4x3 = 12 
+	{  // make any 3 int (3*2 = 6 bytes) into a 8 byte , by concat any 6 bit one after one
+		TransmitBuff[i++] = ((uint16_t)num[j*3]>>10) + 'A';
+		TransmitBuff[i++] = (((uint16_t)num[j*3]>>4) & 0x003F) + 'A';
+		TransmitBuff[i++] = (((num[j*3]<<2) | ((uint16_t)num[j*3 + 1]>>14) ) & 0x003F )+ 'A';
+		TransmitBuff[i++] = (((uint16_t)num[j*3 +1]>>8) & 0x003F )+ 'A';
+		TransmitBuff[i++] = (((uint16_t)num[j*3+1]>>2) & 0x003F )+ 'A';
+		TransmitBuff[i++] = (((num[j*3+1]<<4) | ((uint16_t)num[j*3+2]>>12)) & 0x003F ) + 'A';
+		TransmitBuff[i++] = (((uint16_t)num[j*3+2]>>6) & 0x003F)+ 'A';
+		TransmitBuff[i++] = (num[j*3+2] & 0x003F) + 'A';
+	}
+    TransmitBuff[i] = 0;  
+   if(!Transmiting)          // if we are transmiting , the transmiting will continue by interrupts till the hole 
+                             //  buffer will transmit . if we are not transmiting , start the transmiting.
+   {
+        Transmiting = TRUE;
+        UDR1 = TransmitBuff[0]; 
+   }  
+   return 1;
+}
+
+
+
 //******************************************************************
 //  this function is called automticly when the user press Enter
 //  first it saprate it to oprands (words that have ' ' (space char)
@@ -274,6 +308,7 @@ void HendelNewCommand(void)
 
 void SyncOut(int16_t *IMUData,double *angle)
 {
+	int16_t  dataOut[12]; //the data that will synchronisly print out
 	static int16_t prevMillis = 0;
 	int16_t millis = GetMillis();
 	if ( (millis - prevMillis) < 0)
@@ -281,50 +316,13 @@ void SyncOut(int16_t *IMUData,double *angle)
 	if ( (millis - prevMillis) > 100)
 	{
 		prevMillis = millis;
-		/*PrintString("IMU DATA  ");
-		PrintString("Acc  ");
-		PrintInt(IMUData[0]);
-		PrintString("  ");
-		PrintInt(IMUData[1]);
-		PrintString("  ");
-		PrintInt(IMUData[2]);
-		PrintString("  Gyro  ");
-		PrintInt(IMUData[3]);
-		PrintString("  ");
-		PrintInt(IMUData[4]);
-		PrintString("  ");
-		PrintInt(IMUData[5]);
-		PrintString("  Magno   ");
-		PrintInt(IMUData[6]);
-		PrintString("  ");
-		PrintInt(IMUData[7]);
-		PrintString("  ");
-		PrintInt(IMUData[8]);
-		PrintEndl();*/
-		/*
-		PrintString("angle ");
-		PrintInt((angle[0]*180)/3.14);
-		PrintString("  ");
-		PrintInt((angle[1]*180)/3.14);
-		PrintString("  ");
-		PrintInt((angle[2]*180)/3.14);
-		PrintEndl();
-		*/
-		/*
-		unsigned  char p = 100+(angle[0]*180)/3.14,t = 100+(angle[1]*180)/3.14,ps = 100+(angle[2]*180)/3.14;
+		dataOut[0] = (angle[0]*180)/3.14;
+		dataOut[1] = (angle[1]*180)/3.14;
+		dataOut[2] = (angle[2]*180)/3.14;
 		
-		PrintChar('A');
-		PrintChar(p);
-		PrintChar(t);
-		PrintChar(ps);
-		PrintChar('Z');
-	
-		*/
-		unsigned  char p = 100+(angle[0]*180)/3.14,t = 100+(angle[1]*180)/3.14,ps = 100+(angle[2]*180)/3.14;
-		PrintChar(p);
-		PrintChar(t);
-		PrintChar(ps);
-		PrintChar('\n');
+		PrintString("SYNCOUT");
+		PrintArray(dataOut);	
+		PrintString("ENDL");
 	}
 }
 

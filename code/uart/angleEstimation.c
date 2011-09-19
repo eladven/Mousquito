@@ -4,24 +4,22 @@
 #include "timer0.h"
 #include "math.h"
 
+#define pi 3.141592654 
+#define twopi 6.283185307 
+#define ANGLELIMITER(x)		if (x<-pi) x += twopi; if (x>pi) x -= twopi
+
 void SpiritLevelEstimator(int16_t *IMUData,double *angle)
 {
-	double c0=IMUData[0],c1=IMUData[1],c2=IMUData[2];
-	angle[1] = atan2(c1,c2);
-	angle[0] = atan2(c0,sqrt(c1*c1+c2*c2));
-		PrintString("sfsdfsdf  ");
-		//PrintInt(IMUData[1]);
-		//PrintString("  ");
-		PrintInt((angle[0]*180)/3.14);
-		PrintString("  ");
-		PrintInt((angle[1]*180)/3.14);
-		PrintEndl();
+	double c1=IMUData[1],c2=IMUData[2];
+	angle[0] = atan2(IMUData[1],IMUData[2]);
+	angle[1] = atan2(IMUData[0],sqrt(c1*c1+c2*c2));
+	angle[2] = 0;
 }
 
-void GyroEstimator2(int16_t *IMUData,double *angle)
+void GyroEstimator(int16_t *IMUData,double *angle)
 {
 # define degToRad 0.01745329252
-	static double phi,teta,psi;
+	static double phi=0,teta=0,psi=0;
 	
 	double p= degToRad*IMUData[3]/14.25;
 	double q= degToRad*IMUData[4]/14.25;
@@ -32,16 +30,50 @@ void GyroEstimator2(int16_t *IMUData,double *angle)
 	double sinteta = sin(teta);
 	double costeta = cos(teta);
 	
-	double dphi  = -(p+((q*sinphi)+(r*cosphi))*(sinteta/costeta) );
+	double dphi  = (p+((q*sinphi)+(r*cosphi))*(sinteta/costeta) );
 	double dteta = -((q*cosphi)-(r*sinphi));
-	double dpsi  = (q*sinphi+r*cosphi)/costeta;
+	double dpsi  = -(q*sinphi+r*cosphi)/costeta;
 	
-	/*double dphi  = -p;
-	double dteta = -q;
-	double dpsi  = r;*/
 	
-	phi  = phi + dphi/SYNC_PERIOD;		// int type
-	teta = teta+dteta/SYNC_PERIOD;		// int type
+	phi  = phi + dphi/SYNC_PERIOD;		
+	teta = teta+dteta/SYNC_PERIOD;		
+	psi  = psi + dpsi/SYNC_PERIOD;	
+
+	ANGLELIMITER(phi);
+	ANGLELIMITER(teta);
+	ANGLELIMITER(psi);
+	
+	angle[0] = phi;
+	angle[1] = teta;
+	angle[2] = psi;
+}
+
+
+void Estimator(int16_t *IMUData,double *angle)
+{
+	double c1=IMUData[1],c2=IMUData[2];
+	double accPhi = atan2(IMUData[1],IMUData[2]);
+	double accTeta = atan2(IMUData[0],sqrt(c1*c1+c2*c2));
+	
+# define degToRad 0.01745329252
+	static double phi=0,teta=0,psi=0;
+	
+	double p= degToRad*IMUData[3]/14.25;
+	double q= degToRad*IMUData[4]/14.25;
+	double r= degToRad*IMUData[5]/14.25;
+	
+	double sinphi  = sin(phi );
+	double cosphi  = cos(phi );
+	double sinteta = sin(teta);
+	double costeta = cos(teta);
+	
+	double dphi  = (p+((q*sinphi)+(r*cosphi))*(sinteta/costeta) );
+	double dteta = -((q*cosphi)-(r*sinphi));
+	double dpsi  = -(q*sinphi+r*cosphi)/costeta;
+	
+	
+	phi  = (phi + dphi/SYNC_PERIOD)*0.99 + 0.01*accPhi;		// int type
+	teta = (teta+dteta/SYNC_PERIOD)*0.99 + 0.01*accTeta;		// int type
 	psi  = psi + dpsi/SYNC_PERIOD;								// fsample/2 int type
 	
 	angle[0] = phi;
@@ -49,48 +81,11 @@ void GyroEstimator2(int16_t *IMUData,double *angle)
 	angle[2] = psi;
 }
 
-void GyroEstimator(int16_t *IMUData,double *angle)
-{
-	static double c0=0,c1=0,c2=100;
-	c0 = c0+ ( IMUData[5]*c1-IMUData[4]*c2)/SYNC_PERIOD;
-	c1 = c1+ (-IMUData[5]*c0+IMUData[3]*c2)/SYNC_PERIOD;
-	c2 = c2+ ( IMUData[4]*c0-IMUData[3]*c1)/SYNC_PERIOD;
+
+
+
+/***********************************************************************************************************************/
 	
-	angle[1] = atan2(c1,c2);
-	angle[0] = atan2(c0,sqrt(c1*c1+c2*c2));
-	static int i=0;
-	if (i++>10)
-	{
-		i=0;
-		PrintString("gyro  ");
-		//PrintInt(IMUData[1]);
-		//PrintString("  ");
-		PrintInt(IMUData[3]);
-		PrintString("  ");
-		PrintInt(IMUData[4]);
-		PrintString("  ");
-		PrintInt(IMUData[5]);
-		PrintEndl();
-	    PrintString("c are  ");
-		//PrintInt(IMUData[1]);
-		//PrintString("  ");
-		PrintInt(c0*100);
-		PrintString("  ");
-		PrintInt(c1*100);
-		PrintString("  ");
-		PrintInt(c2*100);
-		PrintEndl();
-		PrintString("sfsdfsdf  ");
-		//PrintInt(IMUData[1]);
-		//PrintString("  ");
-		PrintInt((angle[0]*180)/3.14);
-		PrintString("  ");
-		PrintInt((angle[1]*180)/3.14);
-		PrintEndl();
-		}
-}
-
-
 
 #define dt 1/SYNC_PERIOD
 #define x 0

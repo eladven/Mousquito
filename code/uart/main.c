@@ -40,6 +40,7 @@ int main(void)
 	int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
 	double  angle[3];  //pitch,roll,yaw
 	
+	
 	while (1)   // infinit loop 
 	{
 		int16_t t1,t2;
@@ -49,16 +50,17 @@ int main(void)
 		    t1= GetMillis();
 			LED_ON(4);
 			GetIMUData(IMUData);  // 3 ms
-			GyroEstimator2(IMUData,angle);
+			//GyroEstimator(IMUData,angle);
 			//SpiritLevelEstimator(IMUData,angle);
+			Estimator(IMUData,angle);
 			SyncOut(IMUData,angle);		
-			/*t2= GetMillis();
-				PrintString("time  ");
-		PrintInt(t1);
-		PrintString("  ");
-		PrintInt(t2);
-		PrintEndl();
-		_delay_ms(1000);*/
+		/*	t2= GetMillis(); 
+			PrintString("time  ");
+			PrintInt(t1);
+			PrintString("  ");
+			PrintInt(t2);
+			PrintEndl();
+			_delay_ms(1000); */
 		}
 		LED_OFF(4);	
 	}
