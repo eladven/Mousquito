@@ -3,7 +3,6 @@
 
 #include "main.h"
 #include "uart.h"
-#include "math.h"
 #include "timer0.h"
 
 
@@ -193,7 +192,11 @@ int  PrintInt(int  num)
 
 
 //**************************************************************
-//  this function use fot print integers. it take int16_t and convert it to 3 chars
+//  this function use to print arry of 12 integers. it take group of
+//  three integer (2*3 = 6 bytes =48 bits) , and partition it to eight segments of  bits 
+//  to each segment  , it add the number 'A' (65) and print it ascii value.
+//  at this way, this function print 12 integers by print 8*4 = 32 bytes, which all of them
+//  are PRINTBLE ,so the application that handle that data , can use textual solutions.
 //**************************************************************
 int  PrintArray(int16_t *num)
 {    
@@ -283,20 +286,6 @@ void HendelNewCommand(void)
         }        
     }
 	
-	if (strcmp(operands[0],"intsqrt") ==0)
-    {
-        int tmp=-1;
-        sscanf(operands[1],"%d",&tmp);   
-        intsqt = tmp;
-    }
-	
-	if (strcmp(operands[0],"sqrt") ==0)
-    {
-        int tmp=-1;
-        sscanf(operands[1],"%d",&tmp);   
-        intsqt = tmp;
-    }
-	
 	
 }
 
@@ -306,7 +295,7 @@ void HendelNewCommand(void)
 // that the program shold plot out periodicly.
 //******************************************************************************************//
 
-void SyncOut(int16_t *IMUData,double *angle)
+void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn)
 {
 	int16_t  dataOut[12]; //the data that will synchronisly print out
 	static int16_t prevMillis = 0;
@@ -320,9 +309,29 @@ void SyncOut(int16_t *IMUData,double *angle)
 		dataOut[1] = (angle[1]*180)/3.14;
 		dataOut[2] = (angle[2]*180)/3.14;
 		
-		PrintString("SYNCOUT");
-		PrintArray(dataOut);	
+		/*PrintString("SYNCOUT");
+		//PrintArray(dataOut);	
 		PrintString("ENDL");
+		*/
+		
+		//
+		PrintString("radio  ");
+		for(uint8_t i=0;i<4;i++)
+		{	
+			PrintInt(PPMIn[i]);
+			PrintString("  ");
+			
+		}
+		PrintString("angles ");
+		PrintInt((angle[0]*180)/3.14);
+		PrintString("  ");
+		PrintInt((angle[1]*180)/3.14);
+		PrintString("  ");
+		PrintInt((angle[2]*180)/3.14);
+		PrintString("  ");
+
+		PrintEndl();
+		
 	}
 }
 

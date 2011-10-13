@@ -114,12 +114,13 @@ void  GetIMUDataBias()
 	PrintString("calibrate: ");
 	int16_t tempIMUData[9];
 	int16_t tempIMUDataBias[6];
+	_delay_ms(1000);
 	for (int j=0; j<6; j++)
 	{
 		 tempIMUDataBias[j]=0;
 		 IMUDataBias[j]=0;
 	}
-	for (int i=0; i<10; i++)
+	for (int i=0; i<20; i++)
 	{
 		GetIMUData(tempIMUData);
 		for (int j=0; j<6; j++)
@@ -131,7 +132,7 @@ void  GetIMUDataBias()
 	}
 	for (int j=0; j<6; j++)
 	{
-		IMUDataBias[j]=tempIMUDataBias[j]/10;
+		IMUDataBias[j]=tempIMUDataBias[j]/20;
 	}
 	IMUDataBias[2] -=256; //need to feal the gravity
 	

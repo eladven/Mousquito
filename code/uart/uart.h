@@ -16,11 +16,15 @@
 
 
 void InitUART(void); // method for initilazed the UART modul.
+// method to print to the uart. If This methods work indpendently by interrupts. if thay can't print the specified data 
+// thay will return zero value. else thay will return the value 1.
 int  PrintChar(char c);
 int  PrintString(char *st);
 int  PrintEndl(void);
 int  PrintInt(int  num);
-void SyncOut(int16_t *IMUData,double *angle); // plot data periodicly.
+int  PrintArray(int16_t *num); // this method get array of 12 integers and print the data in a way that 
+// the data is printable 
+void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn); // plot data periodicly.
 
 
 

@@ -8,6 +8,46 @@
 #define twopi 6.283185307 
 #define ANGLELIMITER(x)		if (x<-pi) x += twopi; if (x>pi) x -= twopi
 
+void Estimator(int16_t *IMUData,double *angle)
+{
+	double c1=IMUData[1],c2=IMUData[2];
+	double accPhi = atan2(IMUData[1],IMUData[2]);
+	double accTeta = atan2(IMUData[0],sqrt(c1*c1+c2*c2));
+	
+# define degToRad 0.01745329252
+	static double phi=0,teta=0,psi=0;
+	
+	double p= degToRad*IMUData[3]/14.25;
+	double q= degToRad*IMUData[4]/14.25;
+	double r= degToRad*IMUData[5]/14.25;
+	
+	double sinphi  = sin(phi );
+	double cosphi  = cos(phi );
+	double sinteta = sin(teta);
+	double costeta = cos(teta);
+	
+	double dphi  = (p+((q*sinphi)+(r*cosphi))*(sinteta/costeta) );
+	double dteta = -((q*cosphi)-(r*sinphi));
+	double dpsi  = -(q*sinphi+r*cosphi)/costeta;
+	
+	
+	phi  = (phi + dphi/SYNC_PERIOD)*0.99 + 0.01*accPhi;		// int type
+	teta = (teta+dteta/SYNC_PERIOD)*0.99 + 0.01*accTeta;		// int type
+	psi  = psi + dpsi/SYNC_PERIOD;								// fsample/2 int type
+	
+	angle[0] = phi;
+	angle[1] = teta;
+	angle[2] = psi;
+}
+
+
+
+
+//*******************************************************************************************
+//**************************** Experimental  Estimators *************************************
+//*******************************************************************************************
+
+
 void SpiritLevelEstimator(int16_t *IMUData,double *angle)
 {
 	double c1=IMUData[1],c2=IMUData[2];
@@ -47,42 +87,6 @@ void GyroEstimator(int16_t *IMUData,double *angle)
 	angle[1] = teta;
 	angle[2] = psi;
 }
-
-
-void Estimator(int16_t *IMUData,double *angle)
-{
-	double c1=IMUData[1],c2=IMUData[2];
-	double accPhi = atan2(IMUData[1],IMUData[2]);
-	double accTeta = atan2(IMUData[0],sqrt(c1*c1+c2*c2));
-	
-# define degToRad 0.01745329252
-	static double phi=0,teta=0,psi=0;
-	
-	double p= degToRad*IMUData[3]/14.25;
-	double q= degToRad*IMUData[4]/14.25;
-	double r= degToRad*IMUData[5]/14.25;
-	
-	double sinphi  = sin(phi );
-	double cosphi  = cos(phi );
-	double sinteta = sin(teta);
-	double costeta = cos(teta);
-	
-	double dphi  = (p+((q*sinphi)+(r*cosphi))*(sinteta/costeta) );
-	double dteta = -((q*cosphi)-(r*sinphi));
-	double dpsi  = -(q*sinphi+r*cosphi)/costeta;
-	
-	
-	phi  = (phi + dphi/SYNC_PERIOD)*0.99 + 0.01*accPhi;		// int type
-	teta = (teta+dteta/SYNC_PERIOD)*0.99 + 0.01*accTeta;		// int type
-	psi  = psi + dpsi/SYNC_PERIOD;								// fsample/2 int type
-	
-	angle[0] = phi;
-	angle[1] = teta;
-	angle[2] = psi;
-}
-
-
-
 
 /***********************************************************************************************************************/
 	

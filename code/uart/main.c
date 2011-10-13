@@ -4,7 +4,7 @@
 #include "angleEstimation.h"
 #include "i2c.h"
 #include "imu.h"
-
+#include "ppmIn.h"
 
 void InitLeds(void)
 {
@@ -27,6 +27,7 @@ int main(void)
 	InitTimer0();
 	InitLeds();
 	TWI_Master_Initialise();
+	InitppmIn();
 	sei(); 		//enable global interapt 
 	
 	PrintEndl() ;
@@ -39,6 +40,7 @@ int main(void)
 	
 	int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
 	double  angle[3];  //pitch,roll,yaw
+	int16_t  PPMIn[4];  //data from RC modol
 	
 	
 	while (1)   // infinit loop 
@@ -48,12 +50,31 @@ int main(void)
 		if  (IsNewPeriod())  //if the phase have just changed
 		{
 		    t1= GetMillis();
-			LED_ON(4);
+			//LED_ON(5);
 			GetIMUData(IMUData);  // 3 ms
-			//GyroEstimator(IMUData,angle);
-			//SpiritLevelEstimator(IMUData,angle);
 			Estimator(IMUData,angle);
-			SyncOut(IMUData,angle);		
+			uint8_t rcStatus = GetPPMIn(PPMIn);
+			if (rcStatus == PPM_IN_OK )
+			{
+				LED_ON(4);
+				LED_OFF(5);
+				LED_OFF(6);
+			}
+			else if (rcStatus == No_RF_SIGNAL )
+			{
+				LED_ON(5);
+				LED_OFF(4);
+				LED_OFF(6);
+			}
+			else if(rcStatus == NO_RECIVER_CONECCTION )
+			{
+				LED_ON(6);
+				LED_OFF(5);
+				LED_OFF(4);
+			}
+
+
+			SyncOut(IMUData,angle,PPMIn);		
 		/*	t2= GetMillis(); 
 			PrintString("time  ");
 			PrintInt(t1);
@@ -62,7 +83,6 @@ int main(void)
 			PrintEndl();
 			_delay_ms(1000); */
 		}
-		LED_OFF(4);	
 	}
 	return 1;
 }
