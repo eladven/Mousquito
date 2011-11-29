@@ -51,7 +51,7 @@ uint8_t IsNewPeriod(void)
 	return FALSE;
 }
 
-ISR(TIMER0_COMPA_vect)//TIMER0_COMPA_vect)  //evry 10 kHz
+ISR(TIMER0_COMPA_vect)  //evry 10 kHz
 { 
 	static uint16_t cnt = 0;
 

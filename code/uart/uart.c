@@ -308,13 +308,13 @@ void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn)
 		dataOut[0] = (angle[0]*180)/3.14;
 		dataOut[1] = (angle[1]*180)/3.14;
 		dataOut[2] = (angle[2]*180)/3.14;
-		
-		/*PrintString("SYNCOUT");
-		//PrintArray(dataOut);	
+		/*
+		PrintString("SYNCOUT");
+		PrintArray(dataOut);	
 		PrintString("ENDL");
 		*/
 		
-		//
+		
 		PrintString("radio  ");
 		for(uint8_t i=0;i<4;i++)
 		{	

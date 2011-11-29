@@ -15,10 +15,13 @@ void  InitppmIn(void)
 	// at raising edge 
 	EICRB = (1<<ISC70) | (1<<ISC71);
 	
-    //Normal port operation OC0A disconnect. normal mode of operation
+	//enable compare A interrupt. disable compare B and overflow interrupts
+    TIMSK1 = (0<<OCIE1B)|(1<<OCIE1A)|(0<<TOIE1);
+    //Normal port operation OC0A disconnect. ctc mode of operation
 	TCCR1A = (0<<COM1A1)|(0<<COM1A0)|(0<<COM1B1)|(0<<COM1B0)|(0<<WGM11)|(0<<WGM10);
     // (16 MHz/64 )
-    TCCR1B =  (0<<ICNC1)|(0<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(1<<CS10);	//reset counter
+    TCCR1B =  (0<<ICNC1)|(1<<WGM12)|(0<<WGM13)|(0<<CS12)|(1<<CS11)|(1<<CS10);	//reset counter
+	OCR1A = 10000; // after 10,000 cycle , if there is no external interrupt , generate timer interrupt to indecate connection problem
 	TCNT1 = 0;	
 }
 
@@ -37,15 +40,7 @@ ISR(INT7_vect)
 	uint16_t time= TCNT1; //read the duration of the current signal (from raising edge to raising edge).
 	TCNT1 = 0;
 	
-	if (time > 4000) //check if we hve problem at communication
-	{
-		index = 0;
-		if (noReciverConnectionCounter > 0)
-			noReciverConnectionCounter--;
-		else			
-			_flag = No_RF_SIGNAL;
-	}
-	else if (time > 1000)
+	if (time > 1000)
 	{
 		index = 0;
 		if (noReciverConnectionCounter > 0)
@@ -62,6 +57,14 @@ ISR(INT7_vect)
 	else
 		_chanel[index++] = time; //update chanel;
 }
+
+
+
+ISR(TIMER1_COMPA_vect)  //evry 10 kHz
+{ 
+	_flag = No_RF_SIGNAL;
+}
+
 
 
 

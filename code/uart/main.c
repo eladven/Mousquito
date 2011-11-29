@@ -5,6 +5,7 @@
 #include "i2c.h"
 #include "imu.h"
 #include "ppmIn.h"
+#include "ppmOut.h"
 
 void InitLeds(void)
 {
@@ -28,7 +29,12 @@ int main(void)
 	InitLeds();
 	TWI_Master_Initialise();
 	InitppmIn();
+	InitppmOut();
+
 	sei(); 		//enable global interapt 
+	//////////////////////////////////////////////////////////////
+	PORTA |= (1<<0); //set channel 0 for ppm out sequnce
+	////////////////////////////////////////////////////////////////
 	
 	PrintEndl() ;
 	PrintEndl() ;
@@ -41,7 +47,12 @@ int main(void)
 	int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
 	double  angle[3];  //pitch,roll,yaw
 	int16_t  PPMIn[4];  //data from RC modol
+	int16_t  PPMOut[8] = {0,0,0,0,0,0,0,0};  //data to motors
 	
+	
+	
+	updateSpeed(250,3);
+	updateSpeed(250,2);
 	
 	while (1)   // infinit loop 
 	{
@@ -72,7 +83,6 @@ int main(void)
 				LED_OFF(5);
 				LED_OFF(4);
 			}
-
 
 			SyncOut(IMUData,angle,PPMIn);		
 		/*	t2= GetMillis(); 
