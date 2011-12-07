@@ -6,7 +6,6 @@
 #include "timer0.h"
 
 
-
 // local variables for this modul:
 uint8_t   Transmiting = FALSE;
 uint8_t   ReciveBuff   [BUFF_LENGTH];
@@ -14,9 +13,9 @@ uint8_t   TransmitBuff [BUFF_LENGTH];
 uint8_t   TransmitBuffIndex = 1;  
 uint8_t   ReciveBuffIndex = 0;  
 
-
-int16_t intsqt = -1;  //this variables use for transmit data  between SyncOut and HndelData. their value isthe 
-float sqt = -1;       // incoming argument, -1 means that it is not in use
+// output flags.
+uint8_t syncOutCoded = 0;
+uint8_t syncOutUnCoded = 0;
 
 
 // local functions  for this modul:
@@ -56,7 +55,7 @@ ISR(USART1_RX_vect)
 		if ( (  (c >= 'a' )  && (c<='z') ) || ( (c>='0') && (c<='9') ) || (c==' ')  || (c=='.')) //if we accept this char
 		{  
 		    ReciveBuff[ReciveBuffIndex++]=c;  //push yhe new data to buffer
-            PrintChar(c) ;   
+            PrintChar(c) ;  
         }
     }
     else  // get Enter
@@ -286,6 +285,34 @@ void HendelNewCommand(void)
         }        
     }
 	
+	if (strcmp(operands[0],"syncout") ==0)
+    {
+        if (numOfOperands==1)
+        {
+            PrintString("SYNCOUT ") ;  
+			PrintInt(syncOutUnCoded) ;     
+            PrintEndl() ;      
+        }    
+        else
+        {
+            int tmp=-1;
+            sscanf(operands[1],"%d",&tmp);   
+            if (tmp == 0)
+            {
+                PrintString("SYNCOUT 0") ;    
+                PrintEndl() ;
+				syncOutUnCoded = 0;
+            }  
+			if (tmp == 1)
+            {
+                PrintString("SYNCOUT 1") ;    
+                PrintEndl() ;
+				syncOutUnCoded = 1;
+            }  
+        }        
+    }
+	
+	
 	
 }
 
@@ -302,36 +329,28 @@ void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn)
 	int16_t millis = GetMillis();
 	if ( (millis - prevMillis) < 0)
 		prevMillis = prevMillis - 1000;
-	if ( (millis - prevMillis) > 100)
-	{
+	if ( (millis - prevMillis) > 100) {
 		prevMillis = millis;
-		dataOut[0] = (angle[0]*180)/3.14;
-		dataOut[1] = (angle[1]*180)/3.14;
-		dataOut[2] = (angle[2]*180)/3.14;
-		/*
-		PrintString("SYNCOUT");
-		PrintArray(dataOut);	
-		PrintString("ENDL");
-		*/
-		
-		
-		PrintString("radio  ");
-		for(uint8_t i=0;i<4;i++)
-		{	
-			PrintInt(PPMIn[i]);
+	
+		if (syncOutUnCoded) {
+			PrintString("radio  ");
+			for(uint8_t i=0;i<4;i++) {	
+				PrintInt(PPMIn[i]);
+				PrintString("  ");
+			}
+			PrintString("angles ");
+			PrintInt((angle[0]*180)/3.14);
 			PrintString("  ");
-			
+			PrintInt((angle[1]*180)/3.14);
+			PrintString("  ");
+			PrintInt((angle[2]*180)/3.14);
+			PrintString("  ");
+			PrintEndl();	
 		}
-		PrintString("angles ");
-		PrintInt((angle[0]*180)/3.14);
-		PrintString("  ");
-		PrintInt((angle[1]*180)/3.14);
-		PrintString("  ");
-		PrintInt((angle[2]*180)/3.14);
-		PrintString("  ");
-
-		PrintEndl();
-		
 	}
+	/*dataOut[0] = (angle[0]*180)/3.14;
+			dataOut[1] = (angle[1]*180)/3.14;
+			dataOut[2] = (angle[2]*180)/3.14;
+			*/
 }
 
