@@ -311,6 +311,32 @@ void HendelNewCommand(void)
             }  
         }        
     }
+	if (strcmp(operands[0],"syncoutcoded") ==0)
+    {
+        if (numOfOperands==1)
+        {
+            PrintString("SYNCOUTCODED ") ;  
+			PrintInt(syncOutCoded) ;     
+            PrintEndl() ;      
+        }    
+        else
+        {
+            int tmp=-1;
+            sscanf(operands[1],"%d",&tmp);   
+            if (tmp == 0)
+            {
+                PrintString("SYNCOUTCODED 0") ;    
+                PrintEndl() ;
+				syncOutCoded = 0;
+            }  
+			if (tmp == 1)
+            {
+                PrintString("SYNCOUTCODED 1") ;    
+                PrintEndl() ;
+				syncOutCoded = 1;
+            }  
+        }        
+    }
 	
 	
 	
