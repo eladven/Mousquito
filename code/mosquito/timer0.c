@@ -6,6 +6,7 @@ uint8_t counter=0;  // time [100 usec]
 uint16_t millis = 0;
 uint16_t sec    = 0;
 static uint8_t phase = 0;
+static uint8_t outputPhase = 0;
 
 void InitTimer0(void)
 {
@@ -51,12 +52,26 @@ uint8_t IsNewPeriod(void)
 	return FALSE;
 }
 
+uint8_t IsNewOutputPeriod(void)
+{
+	static uint8_t internalPhase = 0;
+	if (outputPhase != internalPhase)
+	{
+		internalPhase = outputPhase;
+		return TRUE;
+	}
+	return FALSE;
+}
+
 ISR(TIMER0_COMPA_vect)  //evry 10 kHz
 { 
 	static uint16_t cnt = 0;
+	static uint16_t outputCnt = 0;
+
 
 	cnt++;
 	counter ++;
+	outputCnt ++;
 	if (counter == 10)
 	{
 		counter = 0;
@@ -74,6 +89,14 @@ ISR(TIMER0_COMPA_vect)  //evry 10 kHz
 			phase = 0;
 		else
 		    phase = 1;
+	}
+	if (outputCnt == OUTPUT_PERIOD)
+	{
+		outputCnt = 0;
+		if (outputPhase)   //tugel the phase every SYNC_PERIOD
+			outputPhase = 0;
+		else
+		    outputPhase = 1;
 	}
 }
 

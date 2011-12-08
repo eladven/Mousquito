@@ -351,12 +351,9 @@ void HendelNewCommand(void)
 void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn)
 {
 	int16_t  dataOut[12]; //the data that will synchronisly print out
-	static int16_t prevMillis = 0;
+	
 	int16_t millis = GetMillis();
-	if ( (millis - prevMillis) < 0)
-		prevMillis = prevMillis - 1000;
-	if ( (millis - prevMillis) > 100) {
-		prevMillis = millis;
+	if ( IsNewOutputPeriod() )  {
 	
 		if (syncOutUnCoded) {
 			PrintString("radio  ");

@@ -41,19 +41,15 @@ int main(void)
 	PrintString("FLYING MOSQUITO IS ON.") ;    
     PrintEndl() ;
 	PrintEndl() ;
-	
 	InitIMU(); // use i2c, thus must be after sei instruction.
-	
 	int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
 	double  angle[3];  //pitch,roll,yaw
 	int16_t  PPMIn[4];  //data from RC modol
 	int16_t  PPMOut[8] = {0,0,0,0,0,0,0,0};  //data to motors
 	
 	
-	
 	updateSpeed(250,3);
 	updateSpeed(250,2);
-	
 	while (1)   // infinit loop 
 	{
 		int16_t t1,t2;
@@ -61,7 +57,6 @@ int main(void)
 		if  (IsNewPeriod())  //if the phase have just changed
 		{
 		    t1= GetMillis();
-			//LED_ON(5);
 			GetIMUData(IMUData);  // 3 ms
 			Estimator(IMUData,angle);
 			uint8_t rcStatus = GetPPMIn(PPMIn);
@@ -83,7 +78,6 @@ int main(void)
 				LED_OFF(5);
 				LED_OFF(4);
 			}
-
 			SyncOut(IMUData,angle,PPMIn);		
 		/*	t2= GetMillis(); 
 			PrintString("time  ");
