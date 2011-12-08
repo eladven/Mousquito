@@ -1,12 +1,8 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
-
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -14,9 +10,9 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 
 // This is ground station for the Mosquito project.
 // created by Elad Venezian and Maor Mevorach.
@@ -24,6 +20,12 @@ import javax.swing.event.InternalFrameListener;
 
 @SuppressWarnings("serial")
 public class Austin extends JFrame{
+	
+	Terminal _terminal = new Terminal();
+	
+	JPanel _guiTermilal = new GUITerminal(_terminal);
+	
+	//GUI components 
 	private JDesktopPane _deskTop = new JDesktopPane();
 	
 	public Austin(){
@@ -31,6 +33,9 @@ public class Austin extends JFrame{
 		//setSize(getMaximumSize());
 		setSize(300,400);
 		setVisible(true);
+		
+		//functional
+		_terminal.addPortListener((PortListener)_guiTermilal);
 		
 		
 		add(_deskTop);
@@ -78,9 +83,9 @@ public class Austin extends JFrame{
 						new JInternalFrame("Terminal",true,true,true);
 				terminalFrame.setVisible(true);	
 				_deskTop.add(terminalFrame);
+				terminalFrame.add(_guiTermilal);
 				terminalFrame.setVisible(true);	
-				//terminalFrame.pack();
-				terminalFrame.setSize(100,100);
+				terminalFrame.pack();
 				terminalFrame.addInternalFrameListener(new InternalFrameAdapter() {
 					@Override
 					public void internalFrameClosed(InternalFrameEvent arg0) {
@@ -102,11 +107,11 @@ public class Austin extends JFrame{
 	}
 	
 	public static void main(String [] args){
-		
-		Terminal terminal = new Terminal();
 		Austin austin = new Austin();
 		austin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		System.out.println(terminal.getAvailableports() );
+		/*
+		Terminal terminal = new Terminal();
+		System.out.println(terminal.getAvailablePorts() );
 		terminal.setPort("COM9");
 	
 		terminal.connect();
@@ -130,6 +135,7 @@ public class Austin extends JFrame{
 			e.printStackTrace();
 		} 
 		terminal.disconnect();
+		*/
 	}
 }
 	

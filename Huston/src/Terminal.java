@@ -20,6 +20,15 @@ public class Terminal {
 	private InputStream _inputStream;
 	private SerialPort _serialPort;
 	private Thread _reader;
+	private ArrayList<PortListener> portLitenersList = new ArrayList<PortListener>();
+	
+	public void addPortListener(PortListener listener){
+		portLitenersList.add(listener);
+	}
+	
+	public void removePortListener(PortListener listener){
+		portLitenersList.remove(listener);
+	}
 
 	public boolean isConnected(){
 		return _isConnected;
@@ -42,25 +51,25 @@ public class Terminal {
 	}
 
 	// connect to the specify port.
-	public void connect(){ 
+	public boolean connect(){ 
 		CommPortIdentifier portIdentifier;
 		try {
 			portIdentifier = CommPortIdentifier.getPortIdentifier(_port);
 		} catch (NoSuchPortException e) {
 			
 			updateLog("connect()::ERROR -  NoSuchPortException as" + _port);
-			return;
+			return false;
 		}
 		if ( portIdentifier.isCurrentlyOwned() ){
 			updateLog("connect()::ERROR - Port is currently in use");
-			return;
+			return false;
 		}
 
 		try {
 			_serialPort = (SerialPort)portIdentifier.open(this.getClass().getName(),2000);
 		} catch (PortInUseException e) {
 			updateLog("connect()::ERROR - Port is currently in use");
-			return;
+			return false;
 		}
 
 		try {
@@ -68,7 +77,7 @@ public class Terminal {
 		} catch (UnsupportedCommOperationException e) {
 			updateLog("connect()::ERROR - UnsupportedCommOperationException");
 			disconnect();
-			return;
+			return false;
 		}
 
 		try {
@@ -78,10 +87,11 @@ public class Terminal {
 			_reader.start();
 			_isConnected = true;
 			updateLog("CONNECT to "+_port);
+			return true;
 		} catch (IOException e) {
 			updateLog("connect()::ERROR - IOException");
 			disconnect();
-			return;
+			return false;
 		}
 	}     
 
@@ -115,7 +125,8 @@ public class Terminal {
 
 	// this methods route the input to all clients.
 	private void handleInput(String input){
-		System.out.print(input);
+		for (PortListener listener:portLitenersList)
+			listener.handleInput(input);
 	}
 
 	// write char to the serial port
@@ -133,7 +144,7 @@ public class Terminal {
 	}
 	
 	// return list of all the available ports.
-	public ArrayList<String> getAvailableports(){
+	public ArrayList<String> getAvailablePorts(){
 		ArrayList<String>  portListString = new ArrayList<String>();
 		@SuppressWarnings("unchecked")
 		Enumeration<CommPortIdentifier> portList =  
