@@ -3,11 +3,11 @@ import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 
@@ -21,6 +21,7 @@ public class Terminal {
 	private SerialPort _serialPort;
 	private Thread _reader;
 	private ArrayList<PortListener> portLitenersList = new ArrayList<PortListener>();
+	private ArrayList<NumericPortListener> numericPortLitenersList = new ArrayList<NumericPortListener>();
 	
 	public void addPortListener(PortListener listener){
 		portLitenersList.add(listener);
@@ -28,6 +29,14 @@ public class Terminal {
 	
 	public void removePortListener(PortListener listener){
 		portLitenersList.remove(listener);
+	}
+	
+	public void addNumericPortListener(NumericPortListener listener){
+		numericPortLitenersList.add(listener);
+	}
+	
+	public void removeNumericPortListener(NumericPortListener listener){
+		numericPortLitenersList.remove(listener);
 	}
 
 	public boolean isConnected(){
@@ -125,9 +134,19 @@ public class Terminal {
 
 	// this methods route the input to all clients.
 	private void handleInput(String input){
-		for (PortListener listener:portLitenersList)
-			listener.handleInput(input);
+		if (input.length() > 0){
+			for (PortListener listener:portLitenersList)
+				listener.handleInput(input);
+		}
 	}
+	
+	// this methods route the input to all clients.
+		private void handleInput(byte [] input){
+			if (input.length > 0){
+				for (NumericPortListener listener:numericPortLitenersList)
+					listener.handleInput(input);
+			}
+		}
 
 	// write char to the serial port
 	public void write(int c){
@@ -175,6 +194,7 @@ public class Terminal {
 			try{
 				while (_isConnected && (( len = _in.read(buffer)) > -1) ){
 					handleInput(new String(buffer,0,len));
+					handleInput(Arrays.copyOfRange(buffer, 0, len) );
 				}
 			}
 			catch ( IOException e ){

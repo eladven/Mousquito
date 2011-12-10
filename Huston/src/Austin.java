@@ -2,7 +2,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -22,6 +21,7 @@ import javax.swing.event.InternalFrameEvent;
 public class Austin extends JFrame{
 	
 	Terminal _terminal = new Terminal();
+	DataInterpater _interapter = new DataInterpater();
 	
 	JPanel _guiTermilal = new GUITerminal(_terminal);
 	
@@ -30,12 +30,12 @@ public class Austin extends JFrame{
 	
 	public Austin(){
 		super("Austin Ground Station");
-		//setSize(getMaximumSize());
-		setSize(300,400);
+		setSize(getMaximumSize());
 		setVisible(true);
 		
 		//functional
 		_terminal.addPortListener((PortListener)_guiTermilal);
+		_terminal.addNumericPortListener((NumericPortListener)_interapter);
 		
 		
 		add(_deskTop);

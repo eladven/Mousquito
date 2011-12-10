@@ -11,7 +11,10 @@ uint8_t   Transmiting = FALSE;
 uint8_t   ReciveBuff   [BUFF_LENGTH];
 uint8_t   TransmitBuff [BUFF_LENGTH];
 uint8_t   TransmitBuffIndex = 1;  
-uint8_t   ReciveBuffIndex = 0;  
+uint8_t   ReciveBuffIndex = 0;
+
+//output data  
+volatile int16_t _outputData[OUTPUT_BUFFER_SIZE];
 
 // output flags.
 uint8_t syncOutCoded = 0;
@@ -20,6 +23,15 @@ uint8_t syncOutUnCoded = 0;
 
 // local functions  for this modul:
 void HendelNewCommand(void);
+
+
+void setOutputData(int16_t data,uint8_t index){
+	_outputData[index] = data;
+}
+
+int16_t getOutputData(uint8_t index){
+	return _outputData[index];
+}
 
 void InitUART(void)
 {
@@ -100,7 +112,7 @@ ISR(USART1_TX_vect)
 //**************************************************************
 int  PrintChar(char c)
 {            
-    if( (2+TransmitBuffIndex) > (BUFF_LENGTH)) //if the buffer is  full return 0.
+    if( (2+TransmitBuffIndex) >= (BUFF_LENGTH-1)) //if the buffer is  full return 0.
     {
         return 0;
     }
@@ -123,7 +135,7 @@ int  PrintChar(char c)
 //**************************************************************
 int  PrintString(char *st)
 {            
-    if( (strlen(st)+TransmitBuffIndex) > (BUFF_LENGTH-1)) //if the buffer is  full return 0.
+    if( (strlen(st)+TransmitBuffIndex) >= (BUFF_LENGTH-1)) //if the buffer is  full return 0.
     {
         return 0;
     }
@@ -146,7 +158,7 @@ int  PrintString(char *st)
 //**************************************************************
 int  PrintEndl(void)
 {            
-    if( (2+TransmitBuffIndex) > BUFF_LENGTH) //if the buffer is  full return 0.
+    if( (2+TransmitBuffIndex) >= BUFF_LENGTH-1) //if the buffer is  full return 0.
     {
         return 0;
     }
@@ -171,7 +183,7 @@ int  PrintInt(int  num)
 {       
     char st[25];
     sprintf(st,"%d",num);  
-    if( (strlen(st)+TransmitBuffIndex) > BUFF_LENGTH) //if the buffer is  full return 0.
+    if( (strlen(st)+TransmitBuffIndex) >= BUFF_LENGTH-1) //if the buffer is  full return 0.
     {
         return 0;
     }
@@ -199,12 +211,15 @@ int  PrintInt(int  num)
 //**************************************************************
 int  PrintArray(int16_t *num)
 {    
-    if( (TransmitBuffIndex + 32) > BUFF_LENGTH) //if the buffer is  full return 0.
+    if( (TransmitBuffIndex + 45) >= BUFF_LENGTH-1) //if the buffer is  full return 0.
     {
         return 0;
     }
     int i =0;
     for (i=0; TransmitBuff[i];i++); // find the buffers edge 
+	TransmitBuff[i++] = 'O';
+	TransmitBuff[i++] = 'U';
+	TransmitBuff[i++] = 'T';
 	for (int j=0;j<4;j++) //4x3 = 12 
 	{  // make any 3 int (3*2 = 6 bytes) into a 8 byte , by concat any 6 bit one after one
 		TransmitBuff[i++] = ((uint16_t)num[j*3]>>10) + 'A';
@@ -216,6 +231,11 @@ int  PrintArray(int16_t *num)
 		TransmitBuff[i++] = (((uint16_t)num[j*3+2]>>6) & 0x003F)+ 'A';
 		TransmitBuff[i++] = (num[j*3+2] & 0x003F) + 'A';
 	}
+	TransmitBuff[i++] = 'Z';
+	TransmitBuff[i++] = 'Z';
+	TransmitBuff[i++] = 'Z';
+	TransmitBuff[i++] = '\n';
+	TransmitBuff[i++] = 13;
     TransmitBuff[i] = 0;  
    if(!Transmiting)          // if we are transmiting , the transmiting will continue by interrupts till the hole 
                              //  buffer will transmit . if we are not transmiting , start the transmiting.
@@ -348,7 +368,7 @@ void HendelNewCommand(void)
 // that the program shold plot out periodicly.
 //******************************************************************************************//
 
-void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn)
+void SyncOut()
 {
 	int16_t  dataOut[12]; //the data that will synchronisly print out
 	
@@ -356,24 +376,19 @@ void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn)
 	if ( IsNewOutputPeriod() )  {
 	
 		if (syncOutUnCoded) {
-			PrintString("radio  ");
-			for(uint8_t i=0;i<4;i++) {	
-				PrintInt(PPMIn[i]);
-				PrintString("  ");
-			}
 			PrintString("angles ");
-			PrintInt((angle[0]*180)/3.14);
+			PrintInt(_outputData[9]);
 			PrintString("  ");
-			PrintInt((angle[1]*180)/3.14);
+			PrintInt(_outputData[10]);
 			PrintString("  ");
-			PrintInt((angle[2]*180)/3.14);
+			PrintInt(_outputData[11]);
 			PrintString("  ");
 			PrintEndl();	
 		}
+		if (syncOutCoded) {
+			PrintArray(_outputData);
+			PrintArray(_outputData + 12);
+		}
 	}
-	/*dataOut[0] = (angle[0]*180)/3.14;
-			dataOut[1] = (angle[1]*180)/3.14;
-			dataOut[2] = (angle[2]*180)/3.14;
-			*/
 }
 

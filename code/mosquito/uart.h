@@ -13,6 +13,7 @@
 
 #define BAUD_RATE 115200
 #define BUFF_LENGTH 250
+#define OUTPUT_BUFFER_SIZE 24 // the lengte of the output buffer.
 
 
 void InitUART(void); // method for initilazed the UART modul.
@@ -24,7 +25,11 @@ int  PrintEndl(void);
 int  PrintInt(int  num);
 int  PrintArray(int16_t *num); // this method get array of 12 integers and print the data in a way that 
 // the data is printable 
-void SyncOut(int16_t *IMUData,double *angle,int16_t *PPMIn); // plot data periodicly.
+void SyncOut(); // plot data periodicly.
+void setOutputData(int16_t data,uint8_t undex);
+int16_t getOutputData(uint8_t undex);
+
+
 
 
 

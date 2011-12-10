@@ -60,6 +60,19 @@ int main(void)
 			GetIMUData(IMUData);  // 3 ms
 			Estimator(IMUData,angle);
 			uint8_t rcStatus = GetPPMIn(PPMIn);
+			// pass the data to the uart module.
+			for(uint8_t i=0;i<9;i++){
+				setOutputData(IMUData[i],i);
+			}
+			for(uint8_t i=0;i<3;i++){
+				setOutputData((angle[i]*180)/3.14,i+9);
+			}
+			for(uint8_t i=0;i<4;i++){
+				setOutputData(PPMIn[i],i+12);
+			}
+			for(uint8_t i=0;i<4;i++){
+				setOutputData(PPMOut[i],i+16);
+			}
 			if (rcStatus == PPM_IN_OK )
 			{
 				LED_ON(4);
@@ -78,7 +91,7 @@ int main(void)
 				LED_OFF(5);
 				LED_OFF(4);
 			}
-			SyncOut(IMUData,angle,PPMIn);		
+			SyncOut();		
 		/*	t2= GetMillis(); 
 			PrintString("time  ");
 			PrintInt(t1);
