@@ -19,6 +19,27 @@ volatile int16_t _outputData[OUTPUT_BUFFER_SIZE];
 // output flags.
 uint8_t syncOutCoded = 0;
 uint8_t syncOutUnCoded = 0;
+char  _dataLabels[19][20] = {"acc X",  //0
+						"acc_Y",
+						"acc_Z",
+						"gyro_X",
+						"gyro_Y",
+						"gyro_Z",
+						"mag_X",
+						"mag_Y",
+						"mag_Z",
+						"pitch",
+						"roll", //10
+						"yaw",
+						"ppmIn_0",
+						"ppmIn_1",
+						"ppmIn_2",
+						"ppmIn_3",
+						"ppmOut_0",
+						"ppmOut_1",
+						"ppmOut_2",
+						"ppmOut_3"
+							};
 
 
 // local functions  for this modul:
@@ -211,7 +232,7 @@ int  PrintInt(int  num)
 //**************************************************************
 int  PrintArray(int16_t *num)
 {    
-    if( (TransmitBuffIndex + 45) >= BUFF_LENGTH-1) //if the buffer is  full return 0.
+    if( (TransmitBuffIndex + 85) >= BUFF_LENGTH-1) //if the buffer is  full return 0.
     {
         return 0;
     }
@@ -220,7 +241,7 @@ int  PrintArray(int16_t *num)
 	TransmitBuff[i++] = 'O';
 	TransmitBuff[i++] = 'U';
 	TransmitBuff[i++] = 'T';
-	for (int j=0;j<4;j++) //4x3 = 12 
+	for (int j=0;j<12;j++) //4x12 = 36 
 	{  // make any 3 int (3*2 = 6 bytes) into a 8 byte , by concat any 6 bit one after one
 		TransmitBuff[i++] = ((uint16_t)num[j*3]>>10) + 'A';
 		TransmitBuff[i++] = (((uint16_t)num[j*3]>>4) & 0x003F) + 'A';
@@ -358,6 +379,18 @@ void HendelNewCommand(void)
         }        
     }
 	
+	if (strcmp(operands[0],"getdatalabel") ==0)
+    {
+		int tmp=-1;
+        sscanf(operands[1],"%d",&tmp);  
+        if ((tmp >= 0) && (tmp <= 19)){
+            PrintString("GETDATALEBEL ") ;
+			PrintInt(tmp);
+			PrintString(" ");
+			PrintString(_dataLabels[tmp]);
+            PrintEndl() ;
+           }  
+    }
 	
 	
 }
@@ -387,7 +420,6 @@ void SyncOut()
 		}
 		if (syncOutCoded) {
 			PrintArray(_outputData);
-			PrintArray(_outputData + 12);
 		}
 	}
 }

@@ -12,8 +12,8 @@
 #define UART_H
 
 #define BAUD_RATE 115200
-#define BUFF_LENGTH 250
-#define OUTPUT_BUFFER_SIZE 24 // the lengte of the output buffer.
+#define BUFF_LENGTH 1000
+#define OUTPUT_BUFFER_SIZE 36 // the lengte of the output buffer.
 
 
 void InitUART(void); // method for initilazed the UART modul.

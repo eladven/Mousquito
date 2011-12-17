@@ -1,23 +1,26 @@
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class DataInterpater implements NumericPortListener{
 	
-	private int _index = 0;
+	private int _index = -1;
 	private byte [] _prevChar = new byte[3];
-	private final int RAW_DATA_SIZE = 36; //T + data (32) + ZZZ
-	private final int DATA_SIZE = 12; //T + data (32) + ZZZ
+	private final int DATA_SIZE = 36; 
+	//each data is two bytes of 8 bits. each 8 bits are send as 6. 
+	// in addition we add T before and ZZZ after.
+	private final int RAW_DATA_SIZE = (DATA_SIZE*8*2)/6+4; 
 	private byte [] _rawData = new byte[RAW_DATA_SIZE];
 	private int [] _data = new int[DATA_SIZE];
 	private ArrayList<DataListener> dataLitenersList = new ArrayList<DataListener>();
+	private StringBuilder _command  = new StringBuilder();
+	private boolean _isCommand = false;
 	
-	public void addData(DataListener listener){
+	public void addDataListener(DataListener listener){
 		dataLitenersList.add(listener);
 	}
 	
-	public void removeData(DataListener listener){
+	public void removeDataListener(DataListener listener){
 		dataLitenersList.remove(listener);
 	}
 	
@@ -25,6 +28,12 @@ public class DataInterpater implements NumericPortListener{
 	private void handleNewData(){
 		for (DataListener listener:dataLitenersList)
 			listener.handleData(_data);
+	}
+	
+	private void handleNewCommand(String command){
+		String [] operands = command.split(" ");
+		for (DataListener listener:dataLitenersList)
+			listener.handleCommand(operands);
 	}
 
 	@Override
@@ -34,22 +43,35 @@ public class DataInterpater implements NumericPortListener{
 				_prevChar[i] = _prevChar[i-1];
 			_prevChar[0] = input[j];
 	
-			if (_prevChar[2]=='O' && _prevChar[1]=='U' && _prevChar[0]=='T')// if it is start signal
+			if (_prevChar[2]=='O' && _prevChar[1]=='U' && _prevChar[0]=='T'){// if it is start signal
 				_index =0;
-			if (_index<_rawData.length)
+				_isCommand = false; // this is coded data, not command.
+			}
+			if ((_index<_rawData.length) && (_index >= 0))
 				_rawData[_index++] = _prevChar[0];
 			if (_index == _rawData.length){
-				_index++; 
+				_index = -1; 
 				if (_prevChar[2]=='Z' && _prevChar[1]=='Z' && _prevChar[0]=='Z')// if it is stop signal
 					convertRawData();
 			}
 			
+			// deal with commands:
+			if (input[j] == 13){
+				if (_isCommand)
+					handleNewCommand(_command.toString());
+				_isCommand = true; // start parse new command.
+				_command.delete(0, _command.length()); //start new command
+			}
+			else {
+				if (_isCommand && (input[j] != '\n'))
+					_command.append((char)input[j]);			
+			}
+						
 		}
 		
 	}
 	
 	private void convertRawData(){
-		System.out.println("new data: "+Arrays.toString(_rawData));
 		String concatedBinary = "";
 		for (int i=1;i<_rawData.length-3;i++){  // move on the raw data.
 			// first, build string that represent each byte as 6 bits binary

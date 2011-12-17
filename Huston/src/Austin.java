@@ -24,6 +24,7 @@ public class Austin extends JFrame{
 	DataInterpater _interapter = new DataInterpater();
 	
 	JPanel _guiTermilal = new GUITerminal(_terminal);
+	JPanel _graphPanel = new GraphPanel();
 	
 	//GUI components 
 	private JDesktopPane _deskTop = new JDesktopPane();
@@ -36,6 +37,8 @@ public class Austin extends JFrame{
 		//functional
 		_terminal.addPortListener((PortListener)_guiTermilal);
 		_terminal.addNumericPortListener((NumericPortListener)_interapter);
+		
+		_interapter.addDataListener((DataListener)_graphPanel);
 		
 		
 		add(_deskTop);
@@ -55,87 +58,129 @@ public class Austin extends JFrame{
 			}
 		});
 		
+		
+		JMenu commandMenu = new JMenu("Command");
+		commandMenu.setMnemonic('C');
+		
+		JMenuItem startSendDataItem = new JMenuItem("start send data");
+		startSendDataItem.setMnemonic('s');
+		commandMenu.add(startSendDataItem);
+		startSendDataItem.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				_terminal.write("syncoutcoded 1");
+				Thread labelGetter = new Thread(new LabelGetter());
+				labelGetter.start();
+			}
+		});
+		
+		JMenuItem stopSendDataItem = new JMenuItem("stop send data");
+		stopSendDataItem.setMnemonic('p');
+		commandMenu.add(stopSendDataItem);
+		stopSendDataItem.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				_terminal.write("syncoutcoded 0");
+				
+			}
+		});
+		
+		CreateFrameHandler createTerminalHandler = new CreateFrameHandler("Terminal",_guiTermilal);
+		CreateFrameHandler createGraphHandler = new CreateFrameHandler("Mosquito Data",_graphPanel);
+		
 		JMenu windowMenu = new JMenu("Window");
-		fileMenu.setMnemonic('W');
+		windowMenu.setMnemonic('W');
 		
 		JCheckBoxMenuItem terminalItem = new JCheckBoxMenuItem("terminal");
 		terminalItem.setMnemonic('t');
 		windowMenu.add(terminalItem);
-		terminalItem.addItemListener( new ItemListener() {
-			private boolean _isFrameCreated = false;
-			private JCheckBoxMenuItem _sourceItem;
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				_sourceItem = (JCheckBoxMenuItem)event.getItem();
-				if (!_isFrameCreated && _sourceItem.isSelected()){
-					_isFrameCreated = true;
-					CreateFrame();
-					_sourceItem.setSelected(true);
-				}
-				if (_isFrameCreated && !_sourceItem.isSelected()){
-					_sourceItem.setSelected(true);
-				}
-				
-			
-			}
-			private void CreateFrame(){
-				JInternalFrame terminalFrame = 
-						new JInternalFrame("Terminal",true,true,true);
-				terminalFrame.setVisible(true);	
-				_deskTop.add(terminalFrame);
-				terminalFrame.add(_guiTermilal);
-				terminalFrame.setVisible(true);	
-				terminalFrame.pack();
-				terminalFrame.addInternalFrameListener(new InternalFrameAdapter() {
-					@Override
-					public void internalFrameClosed(InternalFrameEvent arg0) {
-						_isFrameCreated = false;
-						_sourceItem.setSelected(false);
-
-						
-					}	
-				});
-			}
-		});
+		terminalItem.addItemListener( createTerminalHandler );
+		
+		JCheckBoxMenuItem graphItem = new JCheckBoxMenuItem("graph");
+		graphItem.setMnemonic('g');
+		windowMenu.add(graphItem);
+		graphItem.addItemListener( createGraphHandler );
 		
 		JMenuBar bar = new JMenuBar();
 		setJMenuBar(bar);
 		bar.add(fileMenu);
+		bar.add(commandMenu);
 		bar.add(windowMenu);
 		
+		//open the needed frames:
+		graphItem.setSelected(true);
+		terminalItem.setSelected(true);
 		
+		
+	}
+	
+	private class CreateFrameHandler implements ItemListener {
+		private boolean _isFrameCreated = false;
+		private JCheckBoxMenuItem _sourceItem;
+		private String _title;
+		private JPanel _panel;
+		private JInternalFrame _newFrame;
+		public CreateFrameHandler(String title,JPanel panel){
+			_title = title;
+			_panel = panel;
+		}
+		@Override
+		public void itemStateChanged(ItemEvent event) {
+			_sourceItem = (JCheckBoxMenuItem)event.getItem();
+			
+			if (!_isFrameCreated && _sourceItem.isSelected()){
+				_isFrameCreated = true;
+				CreateFrame();
+				_sourceItem.setSelected(true);
+			}
+			if (_isFrameCreated && !_sourceItem.isSelected()){
+				_sourceItem.setSelected(true);
+			}
+			if (_newFrame != null) {// put the frame at the front
+				_newFrame.toFront();
+				_newFrame.repaint();
+			}
+		
+		}
+		private void CreateFrame(){
+			_newFrame = 
+					new JInternalFrame(_title,true,true,true);
+			_newFrame.setVisible(true);	
+			_deskTop.add(_newFrame);
+			_newFrame.add(_panel);
+			_newFrame.setVisible(true);	
+			_newFrame.pack();
+			_newFrame.addInternalFrameListener(new InternalFrameAdapter() {
+				@Override
+				public void internalFrameClosed(InternalFrameEvent arg0) {
+					_isFrameCreated = false;
+					_sourceItem.setSelected(false);
+
+					
+				}	
+			});
+		}
+	}
+	
+	
+
+	private class LabelGetter implements Runnable {
+		
+		public void run (){
+			for(int i=0;i<32;i++){
+				_terminal.write("getdatalabel "+i);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// do nothing.
+				}
+			}
+		}
 	}
 	
 	public static void main(String [] args){
 		Austin austin = new Austin();
 		austin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		/*
-		Terminal terminal = new Terminal();
-		System.out.println(terminal.getAvailablePorts() );
-		terminal.setPort("COM9");
-	
-		terminal.connect();
-
-		
-		try
-		{                
-			int c = 0;
-			while ( ( c = System.in.read()) > -1 )
-			{
-				if (c=='d')
-					terminal.disconnect();
-				if (c=='c')
-					terminal.connect();
-				
-				terminal.write(c);
-			}                
-		}
-		catch ( IOException e )
-		{
-			e.printStackTrace();
-		} 
-		terminal.disconnect();
-		*/
 	}
 }
 	

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 
 
+
 public class Terminal {
 	// methods.
 	private String _port; // the port name.
@@ -148,6 +149,14 @@ public class Terminal {
 			}
 		}
 
+		
+		// write char to the serial port
+		public void write(String st){
+			for(int i=0;i<st.length();i++)
+				write(st.charAt(i));
+			write(13); // write enter at the end of the command.
+		}
+		
 	// write char to the serial port
 	public void write(int c){
 		if (!_isConnected){
@@ -193,8 +202,14 @@ public class Terminal {
 			int len = -1;
 			try{
 				while (_isConnected && (( len = _in.read(buffer)) > -1) ){
-					handleInput(new String(buffer,0,len));
-					handleInput(Arrays.copyOfRange(buffer, 0, len) );
+					byte[] tempArray = new byte[len]; // remove zero from the buffer
+					int index =0;
+					for (int i=0;i<len;i++)
+						if (buffer[i]!=0)
+							tempArray[index++] = buffer[i];
+			
+					handleInput(new String(tempArray,0,index));
+					handleInput(Arrays.copyOfRange(tempArray, 0, index) );
 				}
 			}
 			catch ( IOException e ){

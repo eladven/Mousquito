@@ -65,9 +65,8 @@ public class GUITerminal extends JPanel implements PortListener{
 					_screen.replaceRange("",0,
 							_screen.getText().length()-MAX_SCREEN_SIZE); //remove the start of the string.
 				_screen.setCaretPosition(_screen.getText().length()); // Scroll to the bottom
-				for(int i=0;i<_input.getText().length();i++)
-					_terminal.write(_input.getText().charAt(i));
-				_terminal.write(13); // write enter at the end of the command.
+				_terminal.write(_input.getText());
+	
 				_input.setText("");
 			}
 		});
