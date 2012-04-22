@@ -116,7 +116,7 @@ public class GraphPanel extends JPanel implements DataListener{
 	}
 	
 	public Dimension getPreferredSize(){
-		return new Dimension(1000,1000);
+		return new Dimension(800,400);
 	}
 	
 	public Dimension getMinimumSize(){
