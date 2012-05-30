@@ -4,8 +4,8 @@
 #include "main.h"
 #include "ppmIn.h"
 
-uint16_t _chanel[4];
-uint8_t  _flag = PPM_IN_OK;
+static uint16_t _chanel[4] = {0,0,0,0};
+static uint8_t  _flag = PPM_IN_OK;
 
 
 void  InitppmIn(void)
@@ -14,6 +14,8 @@ void  InitppmIn(void)
 	EIMSK = (1<<INT7);
 	// at raising edge 
 	EICRB = (1<<ISC70) | (1<<ISC71);
+	
+	DDRE &= (0<<7);
 	
 	//enable compare A interrupt. disable compare B and overflow interrupts
     TIMSK1 = (0<<OCIE1B)|(1<<OCIE1A)|(0<<TOIE1);
@@ -40,6 +42,9 @@ ISR(INT7_vect)
 	uint16_t time= TCNT1; //read the duration of the current signal (from raising edge to raising edge).
 	TCNT1 = 0;
 	
+	PrintInt(time);
+    PrintEndl();
+	
 	if (time > 1000)
 	{
 		index = 0;
@@ -55,7 +60,7 @@ ISR(INT7_vect)
 		_flag = NO_RECIVER_CONECCTION;
 	}
 	else
-		_chanel[index++] = time; //update chanel;
+		_chanel[index++] = time; //update chanel;	
 }
 
 

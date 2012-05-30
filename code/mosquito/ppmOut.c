@@ -9,8 +9,10 @@ volatile static uint16_t speed[NUM_OF_PPM_CHANNELS]; //speed goes from 0 (min) t
 volatile static uint8_t ppmChannel=0;
 
  
-void InitppmOut(void)
-{	
+void InitppmOut(void){	
+
+	DDRF |= 0xFF;
+	PORTF = 0;
     //normal mode of operation
 	TCCR3A |= (0<<COM3A1)|(0<<COM3A0)|(0<<COM3B1)|(0<<COM3B0)|(0<<WGM31)|(0<<WGM30);
    
@@ -34,7 +36,6 @@ void InitppmOut(void)
 	for(int j=0;j<NUM_OF_PPM_CHANNELS;j++){
 		speed[j]=2000;
 	}	
-	speed[2]= (8*250) + 2000;
 }
 
 
@@ -51,7 +52,7 @@ ISR(TIMER3_COMPA_vect)
 {
 		OCR3B=speed[ppmChannel];
 		//TCNT3 = 0;
-		PORTA |= (1<<ppmChannel); 	
+		PORTF |= (1<<ppmChannel); 	
 }
 
 
@@ -59,7 +60,7 @@ ISR(TIMER3_COMPA_vect)
 //Do this after 1-2ms from tcnt3 set
 ISR(TIMER3_COMPB_vect) 
 {
-	PORTA &= ~(1<<ppmChannel);
+	PORTF &= ~(1<<ppmChannel);
 	
 	if (ppmChannel<3){
 		ppmChannel++;

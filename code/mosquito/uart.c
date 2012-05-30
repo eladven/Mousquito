@@ -392,6 +392,19 @@ void HendelNewCommand(void)
            }  
     }
 	
+	if (strcmp(operands[0],"motor") ==0)
+    {
+		int index=0,value=0;
+        sscanf(operands[1],"%d",&index);  
+		sscanf(operands[2],"%d",&value);  
+        PrintString("MOTOR ") ;
+		PrintInt(index);
+		PrintString(" ");
+		PrintInt(value);
+        PrintEndl();
+		updateSpeed(value,index);
+    }
+	
 	
 }
 
@@ -410,11 +423,13 @@ void SyncOut()
 	
 		if (syncOutUnCoded) {
 			PrintString("angles ");
-			PrintInt(_outputData[9]);
+			PrintInt(_outputData[12]);
 			PrintString("  ");
-			PrintInt(_outputData[10]);
+			PrintInt(_outputData[13]);
 			PrintString("  ");
-			PrintInt(_outputData[11]);
+			PrintInt(_outputData[14]);
+			PrintString("  ");
+			PrintInt(_outputData[15]);
 			PrintString("  ");
 			PrintEndl();	
 		}
