@@ -42,9 +42,17 @@ ISR(INT7_vect)
 	uint16_t time= TCNT1; //read the duration of the current signal (from raising edge to raising edge).
 	TCNT1 = 0;
 	
-	PrintInt(time);
-    PrintEndl();
 	
+	if (time > 1000)
+		index = 0;
+	else if (index < 4)
+		_chanel[index++] = time;
+  /*  PrintString("i ");	
+    PrintInt(index);
+    PrintString("  ");	
+	PrintInt(time);
+    PrintEndl();*/
+	/*
 	if (time > 1000)
 	{
 		index = 0;
@@ -61,6 +69,7 @@ ISR(INT7_vect)
 	}
 	else
 		_chanel[index++] = time; //update chanel;	
+		*/
 }
 
 
