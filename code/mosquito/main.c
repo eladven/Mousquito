@@ -24,6 +24,7 @@ int main(void)
     MCUSR &=~(1<<WDRF);
     WDTCSR |= (1<<WDCE)|(1<<WDE);
     WDTCSR = 0;
+	_delay_ms(1000);
     InitUART();
 	InitTimer0();
 	InitLeds();
