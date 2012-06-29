@@ -27,6 +27,7 @@ int  PrintArray(int16_t *num); // this method get array of 12 integers and print
 // the data is printable 
 void SyncOut(); // plot data periodicly.
 void setOutputData(int16_t data,uint8_t undex);
+void setOutputsData(int16_t* data,uint8_t from,uint8_t to);
 int16_t getOutputData(uint8_t undex);
 
 

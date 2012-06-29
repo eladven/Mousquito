@@ -50,6 +50,15 @@ void setOutputData(int16_t data,uint8_t index){
 	_outputData[index] = data;
 }
 
+void setOutputsData(int16_t* data,uint8_t from,uint8_t to){
+	uint8_t j=0;
+	for(uint8_t i=from;i<=to;i++){
+		setOutputData(data[j],i);
+		j++;
+	}	
+}
+
+
 int16_t getOutputData(uint8_t index){
 	return _outputData[index];
 }
