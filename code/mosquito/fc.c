@@ -6,16 +6,26 @@
 #include "uart.h"
 
 uint8_t _isEngeinsOnFlag = 0;
+uint8_t _isMenualControl = 0;
+
+void setMenualControl(uint8_t isMenualControl){
+	_isMenualControl = isMenualControl;
+}
 
 void fc(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  PPMOut){
 	getRCCommands(PPMIn);
-	if (_isEngeinsOnFlag){
-		for (int i=0;i<4;i++)
+	if (!_isMenualControl){
+		if (_isEngeinsOnFlag){
+			for (int i=0;i<4;i++)
 			PPMOut[i] = 70;
-	} else {
-		for (int i=0;i<4;i++)
-			PPMOut[i] = 0;
+		} else {
+			for (int i=0;i<4;i++)
+				PPMOut[i] = 0;
+		}
 	}
+	
+	setOutputData(_isMenualControl,32);
+	setOutputData(_isEngeinsOnFlag,33);
 }
 
 

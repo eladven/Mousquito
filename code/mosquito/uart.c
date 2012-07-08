@@ -4,6 +4,7 @@
 #include "main.h"
 #include "uart.h"
 #include "timer0.h"
+#include "fc.h"
 
 
 // local variables for this modul:
@@ -19,7 +20,9 @@ volatile int16_t _outputData[OUTPUT_BUFFER_SIZE];
 // output flags.
 uint8_t syncOutCoded = 0;
 uint8_t syncOutUnCoded = 0;
-char  _dataLabels[19][20] = {"acc X",  //0
+uint8_t menualcontrol = 0;
+
+char  _dataLabels[36][20] = {"acc X",  //0
 						"acc_Y",
 						"acc_Z",
 						"gyro_X",
@@ -38,7 +41,23 @@ char  _dataLabels[19][20] = {"acc X",  //0
 						"ppmOut_0",
 						"ppmOut_1",
 						"ppmOut_2",
-						"ppmOut_3"
+						"ppmOut_3",
+						"-", //20
+						"-",
+						"-",
+						"-",
+						"-",
+						"-",
+						"-",
+						"-",
+						"-",
+						"-",
+						"-", //30
+						"-",
+						"menual_Control",
+						"engeins_On",
+						"34",
+						"35"
 							};
 
 
@@ -392,7 +411,7 @@ void HendelNewCommand(void)
     {
 		int tmp=-1;
         sscanf(operands[1],"%d",&tmp);  
-        if ((tmp >= 0) && (tmp <= 19)){
+        if ((tmp >= 0) && (tmp <= 35)){
             PrintString("GETDATALEBEL ") ;
 			PrintInt(tmp);
 			PrintString(" ");
@@ -404,14 +423,48 @@ void HendelNewCommand(void)
 	if (strcmp(operands[0],"motor") ==0)
     {
 		int index=0,value=0;
-        sscanf(operands[1],"%d",&index);  
-		sscanf(operands[2],"%d",&value);  
-        PrintString("MOTOR ") ;
-		PrintInt(index);
-		PrintString(" ");
-		PrintInt(value);
-        PrintEndl();
-		updateSpeed(value,index);
+		if (menualcontrol){
+			sscanf(operands[1],"%d",&index);  
+			sscanf(operands[2],"%d",&value);  
+			PrintString("MOTOR ") ;
+			PrintInt(index);
+			PrintString(" ");
+			PrintInt(value);
+			PrintEndl();
+			setPPMOut(index,value);
+		}else {
+			PrintString("MOTOR - NOT MENUAL CONTROL") ;
+			PrintEndl();
+		}
+    }
+	
+	if (strcmp(operands[0],"menualcontrol") ==0)
+    {
+        if (numOfOperands==1)
+        {
+            PrintString("MENUALCONTROL ") ;  
+			PrintInt(menualcontrol) ;     
+            PrintEndl() ;      
+        }    
+        else
+        {
+            int tmp=-1;
+            sscanf(operands[1],"%d",&tmp);   
+            if (tmp == 0)
+            {
+                PrintString("MENUALCONTROL 0") ;    
+                PrintEndl() ;
+				menualcontrol = 0;
+				setMenualControl(0);
+            }  
+			if (tmp == 1)
+            {
+                PrintString("MENUALCONTROL 1") ;    
+                PrintEndl() ;
+				menualcontrol = 1;
+				setMenualControl(1);
+            }  
+        }        
     }
 	
 	

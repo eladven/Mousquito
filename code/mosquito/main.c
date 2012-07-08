@@ -7,12 +7,21 @@
 #include "ppmIn.h"
 #include "ppmOut.h"
 
+int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
+double  angle[3];  //pitch,roll,yaw
+int16_t  PPMIn[4];  //data from RC modol
+int16_t  PPMOut[8] = {0,0,0,0,0,0,0,0};  //data to motors
+
 void InitLeds(void)
 {
 	DDRB |= (1<<6);
 	DDRB |= (1<<5);
 	DDRB |= (1<<4);
 	PORTB = 0;
+}
+
+void setPPMOut(uint8_t index,int16_t value){
+	PPMOut[index] = value;
 }
 
 
@@ -43,10 +52,6 @@ int main(void)
     PrintEndl() ;
 	PrintEndl() ;
 	InitIMU(); // use i2c, thus must be after sei instruction.
-	int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
-	double  angle[3];  //pitch,roll,yaw
-	int16_t  PPMIn[4];  //data from RC modol
-	int16_t  PPMOut[8] = {0,0,0,0,0,0,0,0};  //data to motors
 	
 	while (1)   // infinit loop 
 	{
