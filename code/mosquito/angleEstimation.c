@@ -3,16 +3,26 @@
 #include "angleEstimation.h"
 #include "timer0.h"
 #include "math.h"
+#include "imu.h"
 
 #define pi 3.141592654 
 #define twopi 6.283185307 
-#define ANGLELIMITER(x)		if (x<-pi) x += twopi; if (x>pi) x -= twopi
+#define ANGLELIMITER(x)		if (x<-pi) x += twopi; if (x>pi) x -= twopi;
 
-void Estimator(int16_t *IMUData,double *angle)
+void Estimator(int16_t *IMUDataInt,double *angle)
 {
-	double c1=IMUData[1],c2=IMUData[2];
+
+	int16_t imuBiases[6];
+	double IMUData[6];
+	GetIMUBiases(imuBiases);
+	// subtract the bias from acc and gyro:
+	for (int j=0; j<6; j++)
+		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20.0;
+		
+	IMUData[2] +=256; //need to feal the gravity
+	
 	double accPhi = atan2(IMUData[1],IMUData[2]);
-	double accTeta = atan2(IMUData[0],sqrt(c1*c1+c2*c2));
+	double accTeta = atan2(IMUData[0],sqrt(IMUData[1]*IMUData[1]+IMUData[2]*IMUData[2]));
 	
 # define degToRad 0.01745329252
 	static double phi=0,teta=0,psi=0;
@@ -31,9 +41,13 @@ void Estimator(int16_t *IMUData,double *angle)
 	double dpsi  = -(q*sinphi+r*cosphi)/costeta;
 	
 	
-	phi  = (phi + dphi/SYNC_PERIOD)*0.99 + 0.01*accPhi;		// int type
-	teta = (teta+dteta/SYNC_PERIOD)*0.99 + 0.01*accTeta;		// int type
+	phi  = (phi + dphi/SYNC_PERIOD)*0.95 + 0.05*accPhi;		// int type
+	teta = (teta+dteta/SYNC_PERIOD)*0.95 + 0.05*accTeta;		// int type
 	psi  = psi + dpsi/SYNC_PERIOD;								// fsample/2 int type
+	
+	ANGLELIMITER(phi);
+	ANGLELIMITER(teta);
+	ANGLELIMITER(psi );
 	
 	angle[0] = phi;
 	angle[1] = teta;

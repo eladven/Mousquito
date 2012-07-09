@@ -36,7 +36,7 @@ void InitIMU(void)
 	messageBuf[2] = 0x18;  
 	TWI_Start_Read_Write( messageBuf, 3 );	
 	
-	GetIMUDataBias();
+	SetIMUDataBias();
 }
 
 void GetIMUData(int16_t *IMUData)
@@ -95,16 +95,10 @@ void GetIMUData(int16_t *IMUData)
 	messageBuf[1] = 0x0A;  	
 	messageBuf[2] = 0x01;  	
 	TWI_Start_Read_Write( messageBuf,3); // one for sla+w + reg add+ reg data
-	
-	// subtract the bias from acc and gyro:
-	for (int j=0; j<6; j++)
-	{
-		IMUData[j]=IMUData[j] - IMUDataBias[j];
-	}
 }
 
 
-void  GetIMUDataBias()
+void  SetIMUDataBias()
 {
  
 	PrintString("calibrating IMU system.");
@@ -113,31 +107,33 @@ void  GetIMUDataBias()
 	PrintEndl();
 	PrintString("calibrate: ");
 	int16_t tempIMUData[9];
-	int16_t tempIMUDataBias[6];
 	_delay_ms(1000);
 	for (int j=0; j<6; j++)
-	{
-		 tempIMUDataBias[j]=0;
 		 IMUDataBias[j]=0;
-	}
 	for (int i=0; i<20; i++)
 	{
 		GetIMUData(tempIMUData);
 		for (int j=0; j<6; j++)
 		{   
-			tempIMUDataBias[j] = tempIMUDataBias[j] + tempIMUData[j];
+			IMUDataBias[j] += tempIMUData[j];
 		}
 		_delay_ms(100);
 		PrintString(".");
 	}
-	for (int j=0; j<6; j++)
-	{
-		IMUDataBias[j]=tempIMUDataBias[j]/20;
-	}
-	IMUDataBias[2] -=256; //need to feal the gravity
 	
 	PrintString("The system is calibrated.");
  	PrintEndl();
+	
+	for (int i=0;i<6;i++){
+		PrintString("IMU bias ");
+		PrintInt(IMUDataBias[i]);
+		PrintEndl();
+	}
+}
+
+void GetIMUBiases(int16_t *biases){
+	for (int i=0;i<6;i++)
+		biases[i] = IMUDataBias[i];
 }
 
 

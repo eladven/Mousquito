@@ -61,6 +61,7 @@ int main(void)
 		{
 		   // t1= GetMillis();
 			GetIMUData(IMUData);  // 3 ms
+			setOutputsData(IMUData,0,8);
 			Estimator(IMUData,angle);
 			uint8_t rcStatus = GetPPMIn(PPMIn);
 			fc(IMUData,angle,PPMIn,PPMOut);
@@ -68,7 +69,7 @@ int main(void)
 				updateSpeed(PPMOut[i],i);
 			
 			// pass the data to the uart module.
-			setOutputsData(IMUData,0,8);
+			
 			for(uint8_t i=0;i<3;i++){
 				setOutputData((angle[i]*180)/3.14,i+9);
 			}
