@@ -52,6 +52,9 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	angle[0] = phi;
 	angle[1] = teta;
 	angle[2] = psi;
+	angle[3] = dphi;
+	angle[4] = dteta;
+	angle[5] = dpsi;
 }
 
 

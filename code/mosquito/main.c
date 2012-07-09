@@ -8,7 +8,7 @@
 #include "ppmOut.h"
 
 int16_t  IMUData[9];  //accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ
-double  angle[3];  //pitch,roll,yaw
+double  angle[6];  //roll,pitch,yaw,d(roll)/dt,d(pitch)/dt,d(yaw)/dt
 int16_t  PPMIn[4];  //data from RC modol
 int16_t  PPMOut[8] = {0,0,0,0,0,0,0,0};  //data to motors
 
