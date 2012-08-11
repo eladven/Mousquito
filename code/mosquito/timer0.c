@@ -11,8 +11,6 @@ static uint8_t outputPhase = 0;
 void InitTimer0(void)
 {
 
-DDRB |= (1<<7);
-
 	//enable compare A interrupt. disable compare B and overflow interrupts
     TIMSK0 = (0<<OCIE0B)|(1<<OCIE0A)|(0<<TOIE0);
     //Normal poert operation OC0A disconnect. CTC mode of operation

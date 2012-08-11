@@ -466,6 +466,24 @@ void HendelNewCommand(void)
             }  
         }        
     }
+	if (strcmp(operands[0],"setconst") ==0)
+    {
+        if (numOfOperands==4)
+        {
+			int i=-1,j=-1,val=-1;
+            sscanf(operands[1],"%d",&i);   
+			sscanf(operands[2],"%d",&j);   
+			sscanf(operands[3],"%d",&val);   
+            PrintString("SETCONST ") ;  
+			PrintInt(i) ; 
+			PrintString(" ") ;  
+			PrintInt(j) ;    
+			PrintString(" ") ;  
+			PrintInt(val) ;            
+            PrintEndl() ;      
+			setConst(i,j,val);
+        }    
+    }
 	
 	
 }
