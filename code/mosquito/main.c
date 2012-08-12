@@ -76,6 +76,21 @@ int main(void)
 			setOutputsData(PPMIn,12,15);
 			setOutputsData(PPMOut,16,19);
 			SyncOut();	
+			
+			if (rcStatus == PPM_IN_OK ){
+				LED_ON(5);
+				LED_OFF(4);
+				LED_OFF(6);
+			} else if (rcStatus == No_RF_SIGNAL){
+				LED_ON(6);
+				LED_OFF(4);
+				LED_OFF(5);
+			} else if (rcStatus == NO_RECIVER_CONECCTION){
+				LED_ON(4);
+				LED_OFF(5);
+				LED_OFF(6);
+			}
+
 	
 		/*	t2= GetMillis(); 
 			PrintString("time  ");

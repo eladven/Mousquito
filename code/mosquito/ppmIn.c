@@ -4,7 +4,7 @@
 #include "main.h"
 #include "ppmIn.h"
 
-static uint16_t _chanel[4] = {0,0,0,0};
+static uint16_t _chanel[4] = {380,380,380,380};
 static uint8_t  _flag = PPM_IN_OK;
 
 
@@ -18,7 +18,7 @@ void  InitppmIn(void)
 	DDRE &= (0<<7);
 	
 	//enable compare A interrupt. disable compare B and overflow interrupts
-  //  TIMSK1 = (0<<OCIE1B)|(1<<OCIE1A)|(0<<TOIE1);
+    TIMSK1 = (0<<OCIE1B)|(1<<OCIE1A)|(0<<TOIE1);
     //Normal port operation OC0A disconnect. ctc mode of operation
 	TCCR1A = (0<<COM1A1)|(0<<COM1A0)|(0<<COM1B1)|(0<<COM1B0)|(0<<WGM11)|(0<<WGM10);
     // (16 MHz/64 ) 
@@ -45,16 +45,6 @@ ISR(INT7_vect)
 	
 	
 	if (time > 1000)
-		index = 0;
-	else if (index < 4)
-		_chanel[index++] = time;
-  /*  PrintString("i ");	
-    PrintInt(index);
-    PrintString("  ");	
-	PrintInt(time);
-    PrintEndl();*/
-	/*
-	if (time > 1000)
 	{
 		index = 0;
 		if (noReciverConnectionCounter > 0)
@@ -66,11 +56,14 @@ ISR(INT7_vect)
 	{
 		index = 3;
 		noReciverConnectionCounter = 100;
-		_flag = NO_RECIVER_CONECCTION;
+		_flag = No_RF_SIGNAL;
 	}
 	else
 		_chanel[index++] = time; //update chanel;	
-		*/
+}
+
+ISR(TIMER1_COMPA_vect){  //evry 10 kHz
+	_flag = NO_RECIVER_CONECCTION;
 }
 
 
