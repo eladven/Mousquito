@@ -5,6 +5,8 @@
 #include "uart.h"
 #include "timer0.h"
 #include "fc.h"
+#include "imu.h"
+#include "memory.h"
 
 
 // local variables for this modul:
@@ -484,6 +486,52 @@ void HendelNewCommand(void)
 			setConst(i,j,val);
         }    
     }
+	if (strcmp(operands[0],"setimubias") ==0){
+	    PrintString("SETIMUBIAS ") ;            
+        PrintEndl() ;     
+        SetIMUDataBias();
+    }
+	if (strcmp(operands[0],"saveimubias") ==0)
+    {
+        if (numOfOperands==2)
+        {
+			int i=-1;
+            sscanf(operands[1],"%d",&i);   
+			if (i>=0 && i < NUM_OFBIASES_SETS){
+				PrintString("SAVEIMUBIAS ") ;  
+				PrintInt(i) ;   
+				PrintEndl() ;   
+				writeToMemory(GetIMUBiases(),IMU_BIASES_ADRESS[i],6);
+			}   
+        }    
+    }
+	if (strcmp(operands[0],"loadimubias") ==0)
+    {
+        if (numOfOperands==2)
+        {
+			int i=-1;
+            sscanf(operands[1],"%d",&i);   
+			if (i>=0 && i < NUM_OFBIASES_SETS){
+				PrintString("LOADIMUBIAS ") ;  
+				PrintInt(i) ;   
+				PrintEndl() ;   
+				readFromMemory(GetIMUBiases(),IMU_BIASES_ADRESS[i],6);
+		
+			}   
+        }    
+    }
+	if (strcmp(operands[0],"printimubias") ==0)
+    {
+		PrintString("PRINTIMUBIAS ") ;  
+		PrintEndl() ;   
+		PrintString("ACCX ACCY ACCZ GYROX GYROY GYROZ") ;  
+		PrintEndl() ;
+		for (uint8_t i=0;i<6;i++){
+			PrintInt(GetIMUBiases()[i]) ;  
+			PrintString(" "); 
+		}
+		PrintEndl() ;   
+    }
 	
 	
 }
@@ -500,7 +548,8 @@ void SyncOut()
 	
 	int16_t millis = GetMillis();
 	if ( IsNewOutputPeriod() )  {
-	
+		addIMUDataBias(); // add one bias sample if needed
+		
 		if (syncOutUnCoded) {
 			PrintString("angles ");
 			PrintInt(_outputData[12]);

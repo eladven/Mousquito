@@ -28,12 +28,12 @@ uint16_t GetMicros(void) //returns time [100 usec]
 	return counter; 
 }
 
-uint16_t GetMillis(void) //returns time [100 usec]
+uint16_t GetMillis(void) 
 {
 	return millis; 
 }
 
-uint16_t GetSecs(void) //returns time [100 usec]
+uint16_t GetSecs(void)  
 {
 	return sec; 
 }

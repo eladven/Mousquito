@@ -3,8 +3,11 @@
 #include "imu.h"
 #include "i2c.h"
 #include "uart.h"
+#include "timer0.h"
+#include "memory.h"
 
 static int16_t  IMUDataBias[6]; 
+static int16_t _IMUData[9];
 
 
 void InitIMU(void)
@@ -36,7 +39,7 @@ void InitIMU(void)
 	messageBuf[2] = 0x18;  
 	TWI_Start_Read_Write( messageBuf, 3 );	
 	
-	SetIMUDataBias();
+	readFromMemory(GetIMUBiases(),IMU_BIASES_ADRESS[0],6);
 }
 
 void GetIMUData(int16_t *IMUData)
@@ -95,45 +98,42 @@ void GetIMUData(int16_t *IMUData)
 	messageBuf[1] = 0x0A;  	
 	messageBuf[2] = 0x01;  	
 	TWI_Start_Read_Write( messageBuf,3); // one for sla+w + reg add+ reg data
+	for (uint8_t i=0;i<9;i++){
+		_IMUData[i] = IMUData[i];
+	}
 }
 
+static uint8_t calibrationCounter = 0;
 
-void  SetIMUDataBias()
-{
- 
+void SetIMUDataBias(){
 	PrintString("calibrating IMU system.");
  	PrintEndl();
 	PrintString("The system must be stand still and horizontaly.");
 	PrintEndl();
 	PrintString("calibrate: ");
-	int16_t tempIMUData[9];
-	_delay_ms(1000);
+	calibrationCounter = 20;
 	for (int j=0; j<6; j++)
 		 IMUDataBias[j]=0;
-	for (int i=0; i<20; i++)
-	{
-		GetIMUData(tempIMUData);
-		for (int j=0; j<6; j++)
-		{   
-			IMUDataBias[j] += tempIMUData[j];
-		}
-		_delay_ms(100);
-		PrintString(".");
+}
+
+void addIMUDataBias()
+{
+	if (!calibrationCounter)
+		return;
+		
+	for (int j=0; j<6; j++){   
+		IMUDataBias[j] += _IMUData[j];
 	}
+	PrintString(".");
 	
-	PrintString("The system is calibrated.");
- 	PrintEndl();
-	
-	for (int i=0;i<6;i++){
-		PrintString("IMU bias ");
-		PrintInt(IMUDataBias[i]);
+	if (--calibrationCounter ==0){
+		PrintString("The system is calibrated.");
 		PrintEndl();
 	}
 }
 
-void GetIMUBiases(int16_t *biases){
-	for (int i=0;i<6;i++)
-		biases[i] = IMUDataBias[i];
+int16_t *GetIMUBiases(){
+	return IMUDataBias;
 }
 
 

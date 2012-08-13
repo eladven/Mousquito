@@ -33,7 +33,8 @@ int main(void)
     MCUSR &=~(1<<WDRF);
     WDTCSR |= (1<<WDCE)|(1<<WDE);
     WDTCSR = 0;
-	_delay_ms(3000);
+	_delay_ms(500);
+	sei(); 		//enable global interapt 
     InitUART();
 	InitTimer0();
 	InitLeds();
@@ -41,7 +42,7 @@ int main(void)
 	InitppmIn();
 	InitppmOut();
 
-	sei(); 		//enable global interapt 
+	
 	//////////////////////////////////////////////////////////////
 	PORTA |= (1<<0); //set channel 0 for ppm out sequnce
 	////////////////////////////////////////////////////////////////

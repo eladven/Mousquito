@@ -12,9 +12,9 @@
 void Estimator(int16_t *IMUDataInt,double *angle)
 {
 
-	int16_t imuBiases[6];
+	int16_t * imuBiases;
 	double IMUData[6];
-	GetIMUBiases(imuBiases);
+	imuBiases = GetIMUBiases();
 	// subtract the bias from acc and gyro:
 	for (int j=0; j<6; j++)
 		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20.0;
