@@ -41,8 +41,8 @@ void setConst(int16_t i,int16_t j,int16_t val){
 
            //   motors:        0         1          2         3
 int16_t mixer[4][4] = {{MIXER_VAL ,MIXER_VAL ,MIXER_VAL ,MIXER_VAL  },     //u1 colective
-                        {-MIXER_VAL,0         ,MIXER_VAL ,0         },     //u2 roll
-						{ 0        ,-MIXER_VAL, 0        ,MIXER_VAL },     //u3 pitch
+                        {MIXER_VAL ,0         ,-MIXER_VAL,0         },     //u2 roll
+						{ 0        ,MIXER_VAL, 0        ,-MIXER_VAL },     //u3 pitch
 						{MIXER_VAL ,-MIXER_VAL,MIXER_VAL ,-MIXER_VAL}};    //u4 yaw
 
 void setMenualControl(uint8_t isMenualControl){
@@ -66,10 +66,12 @@ void fc(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  PPMOut){
 			u[3] = PPMIn[3]*YAW_FACTOR+P_YAW*angle[2]+D_YAW*angle[5];
 			*/
 			////////////////////////////
-			u[0] = (PPMIn[2]+145)*_constants[0][0];
-			u[1] = PPMIn[1]*_constants[0][1]+_constants[1][1]*angle[0]+_constants[2][1]*angle[3];
+			u[0] = (PPMIn[2]+145)*_constants[0][0];  //colective
+			u[1] = PPMIn[1]*_constants[0][1]+_constants[1][1]*angle[0]+_constants[2][1]*angle[3]; //roll
 			u[2] = PPMIn[0]*_constants[0][2]+_constants[1][2]*angle[1]+_constants[2][2]*angle[4];
 			u[3] = PPMIn[3]*_constants[0][3]+_constants[1][3]*angle[2]+_constants[2][3]*angle[5];
+			
+			setOutputsData(u,20,23);
 			////////////////////////////////////////////
 			for (int i=0;i<4;i++){
 				PPMOut[i] = 0;
@@ -78,6 +80,7 @@ void fc(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  PPMOut){
 				}
 				PPMOut[i] = PPMOut[i]/100;
 				SPEED_LIMITER(PPMOut[i]);
+				
 			}
 		} else {
 			for (int i=0;i<4;i++)

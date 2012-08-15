@@ -66,8 +66,11 @@ int main(void)
 			Estimator(IMUData,angle);
 			uint8_t rcStatus = GetPPMIn(PPMIn);
 			fc(IMUData,angle,PPMIn,PPMOut);
-			for (int i=0;i<4;i++)
-				updateSpeed(PPMOut[i],i);
+		//	for (int i=0;i<4;i++)
+		//		updateSpeed(PPMOut[i],i);
+		
+		updateSpeed(PPMOut[1],1);
+		updateSpeed(PPMOut[3],3);
 			
 			// pass the data to the uart module.
 			
