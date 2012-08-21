@@ -7,7 +7,17 @@
 
 #define pi 3.141592654 
 #define twopi 6.283185307 
+#define degToRad 0.01745329252
 #define ANGLELIMITER(x)		if (x<-pi) x += twopi; if (x>pi) x -= twopi;
+static double phi=0,teta=0,psi=0;
+
+void resetYaw(){
+	psi = 0;
+}
+
+void updateYaw(int16_t angle){
+	psi += 0.001*angle;
+}
 
 void Estimator(int16_t *IMUDataInt,double *angle)
 {
@@ -23,10 +33,7 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	
 	double accPhi = atan2(IMUData[1],IMUData[2]);
 	double accTeta = atan2(IMUData[0],sqrt(IMUData[1]*IMUData[1]+IMUData[2]*IMUData[2]));
-	
-# define degToRad 0.01745329252
-	static double phi=0,teta=0,psi=0;
-	
+
 	double p= degToRad*IMUData[3]/14.25;
 	double q= degToRad*IMUData[4]/14.25;
 	double r= degToRad*IMUData[5]/14.25;

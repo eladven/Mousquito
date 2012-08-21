@@ -29,9 +29,9 @@ uint8_t _isMenualControl = 0;
 ////////////////////////////////////////////////////////////////////
 
 //                         //colec,roll,pitch,yaw
-int16_t _constants[3][4] = {{103,0,0,0},   //factor
-							{0  ,0,0,0},    //p
-							{0  ,0,0,0}};  //d
+int16_t _constants[3][4] = {{103 ,60   ,60   ,0},   //factor
+							{0    ,7000 ,7000 ,0},    //p
+							{0    ,3500 ,3500 ,0}};  //d
 							
 void setConst(int16_t i,int16_t j,int16_t val){
 	_constants[i][j] = val;
@@ -41,7 +41,7 @@ void setConst(int16_t i,int16_t j,int16_t val){
 
            //   motors:        0         1          2         3
 int16_t mixer[4][4] = {{MIXER_VAL ,MIXER_VAL ,MIXER_VAL ,MIXER_VAL  },     //u1 colective
-                        {MIXER_VAL ,0         ,-MIXER_VAL,0         },     //u2 roll
+                        {-MIXER_VAL,0         ,MIXER_VAL ,0         },     //u2 roll
 						{ 0        ,MIXER_VAL, 0        ,-MIXER_VAL },     //u3 pitch
 						{MIXER_VAL ,-MIXER_VAL,MIXER_VAL ,-MIXER_VAL}};    //u4 yaw
 
@@ -51,6 +51,7 @@ void setMenualControl(uint8_t isMenualControl){
 
 void fc(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  PPMOut){
 	getRCCommands(PPMIn);
+	updateYaw(PPMIn[3]*_constants[0][3]/15);
 	if (!_isMenualControl){
 		if (_isEngeinsOnFlag){
 			// lets define four control signals:
@@ -67,9 +68,11 @@ void fc(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  PPMOut){
 			*/
 			////////////////////////////
 			u[0] = (PPMIn[2]+145)*_constants[0][0];  //colective
-			u[1] = PPMIn[1]*_constants[0][1]+_constants[1][1]*angle[0]+_constants[2][1]*angle[3]; //roll
-			u[2] = PPMIn[0]*_constants[0][2]+_constants[1][2]*angle[1]+_constants[2][2]*angle[4];
-			u[3] = PPMIn[3]*_constants[0][3]+_constants[1][3]*angle[2]+_constants[2][3]*angle[5];
+			u[1] = PPMIn[1]*_constants[0][1]+(_constants[1][1]*angle[0]+_constants[2][1]*angle[3]); //roll
+			u[2] = PPMIn[0]*_constants[0][2]+(_constants[1][2]*angle[1]+_constants[2][2]*angle[4]); //pitch
+			u[3] =                            (_constants[1][3]*angle[2]+_constants[2][3]*angle[5]); //yaw
+			
+			
 			
 			setOutputsData(u,20,23);
 			////////////////////////////////////////////
@@ -113,6 +116,7 @@ void getRCCommands(int16_t*  PPMIn){
 	
 	if (dowenRightCounter > TIME_OF_COMMAND ) {
 		_isEngeinsOnFlag = 1;
+		resetYaw();
 	}
 	
 	if (dowenLeftCounter > TIME_OF_COMMAND ) {
