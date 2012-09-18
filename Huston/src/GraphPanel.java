@@ -173,8 +173,11 @@ public class GraphPanel extends JPanel implements DataListener{
 				e.printStackTrace();
 				return;
 			}
-			if ( (index>=0) && (index < _chooseData.length) &&(operands.length>=2) )
+			if ( (index>=0) && (index < _chooseData.length) &&(operands.length>2) ){
 				_chooseData[index].setText(operands[2]);
+				
+			}
+			
 		}
 		
 	}

@@ -32,8 +32,12 @@ public class DataInterpater implements NumericPortListener{
 	
 	private void handleNewCommand(String command){
 		String [] operands = command.split(" ");
-		for (DataListener listener:dataLitenersList)
+		String [] newLine = new String [1];
+		newLine[0] = "\n";
+		for (DataListener listener:dataLitenersList){
 			listener.handleCommand(operands);
+			listener.handleCommand(newLine);
+		}
 	}
 
 	@Override

@@ -140,23 +140,23 @@ public class Terminal {
 				listener.handleInput(input);
 		}
 	}
-	
-	// this methods route the input to all clients.
-		private void handleInput(byte [] input){
-			if (input.length > 0){
-				for (NumericPortListener listener:numericPortLitenersList)
-					listener.handleInput(input);
-			}
-		}
 
-		
-		// write char to the serial port
-		public void write(String st){
-			for(int i=0;i<st.length();i++)
-				write(st.charAt(i));
-			write(13); // write enter at the end of the command.
+	// this methods route the input to all clients.
+	private void handleInput(byte [] input){
+		if (input.length > 0){
+			for (NumericPortListener listener:numericPortLitenersList)
+				listener.handleInput(input);
 		}
-		
+	}
+
+
+	// write char to the serial port
+	public void write(String st){
+		for(int i=0;i<st.length();i++)
+			write(st.charAt(i));
+		write(13); // write enter at the end of the command.
+	}
+
 	// write char to the serial port
 	public void write(int c){
 		if (!_isConnected){
@@ -170,7 +170,7 @@ public class Terminal {
 			disconnect();
 		}
 	}
-	
+
 	// return list of all the available ports.
 	public ArrayList<String> getAvailablePorts(){
 		ArrayList<String>  portListString = new ArrayList<String>();

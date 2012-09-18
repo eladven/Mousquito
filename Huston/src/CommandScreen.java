@@ -1,4 +1,3 @@
-import java.awt.GridLayout;
 
 import javax.swing.JPanel;
 //import javax.swing.JTextArea;
@@ -7,16 +6,13 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class CommandScreen extends JPanel implements DataListener{
-	GraphPanel _graphPanel = new GraphPanel();
+	private GraphPanel _graphPanel = new GraphPanel();
+	private CommunicationScreen _comScreen;
 	
-	public CommandScreen(){
-	//	JTextField output = new JTextField();
-	//	JTextArea screen = new JTextArea();
-		setLayout(new GridLayout(1,2));
-		
-		//add(output);
-		//add(screen);
+	public CommandScreen(Terminal terminal){
 		add(_graphPanel);
+		_comScreen = new CommunicationScreen(terminal);
+		add(_comScreen);
 		
 	}
 
@@ -28,6 +24,8 @@ public class CommandScreen extends JPanel implements DataListener{
 	@Override
 	public void handleCommand(String[] operands) {
 		_graphPanel.handleCommand(operands);
+		for (String operand:operands)
+			_comScreen.appendScreen(operand);
 		
 	}
 
