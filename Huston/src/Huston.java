@@ -15,8 +15,6 @@ import javax.swing.UIManager;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import Simulation3D.TreeDFrame;
-
 // This is ground station for the Mosquito project.
 // created by Elad Venezian and Maor Mevorach.
 // 123
