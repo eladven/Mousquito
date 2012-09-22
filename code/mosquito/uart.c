@@ -18,6 +18,7 @@ uint8_t   ReciveBuffIndex = 0;
 
 //output data  
 volatile int16_t _outputData[OUTPUT_BUFFER_SIZE];
+int16_t _uartPPMIn[4] = {0,0,0,0};
 
 // output flags.
 uint8_t syncOutCoded = 0;
@@ -297,7 +298,9 @@ int  PrintArray(int16_t *num)
    return 1;
 }
 
-
+int16_t* getUartPPMIn(){
+	return _uartPPMIn;
+}
 
 //******************************************************************
 //  this function is called automticly when the user press Enter
@@ -445,26 +448,19 @@ void HendelNewCommand(void)
         if (numOfOperands==1)
         {
             PrintString("MENUALCONTROL ") ;  
-			PrintInt(menualcontrol) ;     
+			PrintInt(getControl()) ;     
             PrintEndl() ;      
         }    
         else
         {
             int tmp=-1;
             sscanf(operands[1],"%d",&tmp);   
-            if (tmp == 0)
+            if (tmp != -1)
             {
-                PrintString("MENUALCONTROL 0") ;    
+                PrintString("MENUALCONTROL ") ; 
+				PrintInt(tmp) ;       
                 PrintEndl() ;
-				menualcontrol = 0;
-				setMenualControl(0);
-            }  
-			if (tmp == 1)
-            {
-                PrintString("MENUALCONTROL 1") ;    
-                PrintEndl() ;
-				menualcontrol = 1;
-				setMenualControl(1);
+				setControl(tmp);
             }  
         }        
     }
@@ -484,6 +480,46 @@ void HendelNewCommand(void)
 			PrintInt(val) ;            
             PrintEndl() ;      
 			setConst(i,j,val);
+        }    
+		else if (numOfOperands==3)
+        {
+			int i=-1,j=-1;
+            sscanf(operands[1],"%d",&i);   
+			sscanf(operands[2],"%d",&j);     
+            PrintString("SETCONST ") ;  
+			PrintInt(i) ; 
+			PrintString(" ") ;  
+			PrintInt(j) ;    
+			PrintString(" ") ;  
+			PrintInt(getConst(i,j)) ;            
+            PrintEndl() ;      
+		
+        }    
+    }
+	if (strcmp(operands[0],"setcontrol") ==0)
+    {
+        if (numOfOperands==3)
+        {
+			int i=-1,val=-1;
+            sscanf(operands[1],"%d",&i);      
+			sscanf(operands[3],"%d",&val);   
+            PrintString("SETCONTROL ") ;  
+			PrintInt(i) ; 
+			PrintString(" ") ;    
+			PrintInt(val) ;            
+            PrintEndl() ;      
+			_uartPPMIn[i] = val;
+        }    
+		else if (numOfOperands==2)
+        {
+			int i=-1,j=-1;
+            sscanf(operands[1],"%d",&i);   
+            PrintString("SETCONTROL ") ;  
+			PrintInt(i) ; 
+			PrintString(" ") ;  
+			PrintInt(_uartPPMIn[i]) ;           
+            PrintEndl() ;      
+		
         }    
     }
 	if (strcmp(operands[0],"setimubias") ==0){

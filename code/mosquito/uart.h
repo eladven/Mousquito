@@ -15,6 +15,11 @@
 #define BUFF_LENGTH 1000
 #define OUTPUT_BUFFER_SIZE 36 // the lengte of the output buffer.
 
+#define RF_CONTROL 0
+#define MANUEL_CONTROL 1
+#define UART_CONTROL 2
+
+
 
 void InitUART(void); // method for initilazed the UART modul.
 // method to print to the uart. If This methods work indpendently by interrupts. if thay can't print the specified data 
