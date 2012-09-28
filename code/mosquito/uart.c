@@ -49,9 +49,9 @@ char  _dataLabels[36][20] = {"acc X",  //0
 						"u1",
 						"u2",
 						"u3",
-						"24",
-						"25",
-						"26",
+						"droll",
+						"dpitch",
+						"dyaw",
 						"27",
 						"28",
 						"29",
@@ -116,7 +116,7 @@ ISR(USART1_RX_vect)
     //static char st[2]="a";
     if (c!=13)   //if its not Enter signal
     {
-		if ( (  (c >= 'a' )  && (c<='z') ) || ( (c>='0') && (c<='9') ) || (c==' ')  || (c=='.')) //if we accept this char
+		if ( (  (c >= 'a' )  && (c<='z') ) || ( (c>='0') && (c<='9') ) || (c==' ')  || (c=='.') || (c=='-')) //if we accept this char
 		{  
 		    ReciveBuff[ReciveBuffIndex++]=c;  //push yhe new data to buffer
             PrintChar(c) ;  
@@ -385,6 +385,24 @@ void HendelNewCommand(void)
             }  
         }        
     }
+	if (strcmp(operands[0],"enjon") ==0)
+    {
+        if (numOfOperands==1)
+        {
+            PrintString("ENJON ");  
+			PrintInt(getEngeinsOn()) ;     
+            PrintEndl() ;      
+        }    
+        else
+        {
+            int tmp=-1;
+            sscanf(operands[1],"%d",&tmp);   
+            PrintString("ENJON 0") ; 
+			PrintInt(tmp) ;
+			getEngeinsOn(setEngeinsOn(tmp));     
+            PrintEndl() ;
+        }        
+    }
 	if (strcmp(operands[0],"syncoutcoded") ==0)
     {
         if (numOfOperands==1)
@@ -428,7 +446,7 @@ void HendelNewCommand(void)
 	if (strcmp(operands[0],"motor") ==0)
     {
 		int index=0,value=0;
-		if (menualcontrol){
+		if (getControl() == MANUEL_CONTROL){
 			sscanf(operands[1],"%d",&index);  
 			sscanf(operands[2],"%d",&value);  
 			PrintString("MOTOR ") ;
@@ -502,7 +520,7 @@ void HendelNewCommand(void)
         {
 			int i=-1,val=-1;
             sscanf(operands[1],"%d",&i);      
-			sscanf(operands[3],"%d",&val);   
+			sscanf(operands[2],"%d",&val);   
             PrintString("SETCONTROL ") ;  
 			PrintInt(i) ; 
 			PrintString(" ") ;    
@@ -512,7 +530,7 @@ void HendelNewCommand(void)
         }    
 		else if (numOfOperands==2)
         {
-			int i=-1,j=-1;
+			int i=-1;
             sscanf(operands[1],"%d",&i);   
             PrintString("SETCONTROL ") ;  
 			PrintInt(i) ; 

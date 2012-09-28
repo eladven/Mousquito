@@ -51,6 +51,8 @@ int main(void)
 	PrintEndl() ;
 	PrintString("FLYING MOSQUITO IS ON.") ;    
     PrintEndl() ;
+	PrintString("VERSION 1.0") ;    
+    PrintEndl() ;
 	PrintEndl() ;
 	InitIMU(); // use i2c, thus must be after sei instruction.
 	
@@ -70,11 +72,6 @@ int main(void)
 				updateSpeed(PPMOut[i],i);
 		
 			// pass the data to the uart module.
-			
-			for(uint8_t i=0;i<3;i++){
-				setOutputData((angle[i]*180)/3.14,i+9);
-			}
-			setOutputsData(PPMIn,12,15);
 			setOutputsData(PPMOut,16,19);
 			SyncOut();	
 			

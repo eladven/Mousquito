@@ -42,6 +42,14 @@ void setConst(int16_t i,int16_t j,int16_t val){
 int16_t getConst(int16_t i,int16_t j){
 	return _constants[i][j];
 }
+
+void setEngeinsOn(int8_t val){
+	_isEngeinsOnFlag = val;
+}	
+
+int8_t getEngeinsOn(){
+	return _isEngeinsOnFlag;
+}	
 ////////////////////////////////////////////////////////////////////
 
            //   motors:        0         1          2         3
@@ -98,7 +106,7 @@ void doFlightControl(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  
 		for (int i=0;i<4;i++)
 			PPMOut[i] = 0;
 	}
-	
+	setOutputsData(PPMIn,12,15);
 	setOutputData(_control,32);
 	setOutputData(_isEngeinsOnFlag,33);
 }
