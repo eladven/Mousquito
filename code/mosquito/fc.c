@@ -30,9 +30,9 @@ uint8_t _control =  RF_CONTROL;
 ////////////////////////////////////////////////////////////////////
 
 //                         //colec,roll,pitch,yaw
-int16_t _constants[3][4] = {{103 ,0    ,0   ,0},   //factor
-							{0    ,7000 ,7000 ,0},    //p
-							{0    ,3500 ,3500 ,0}};  //d
+int16_t _constants[3][4] = {{10 ,0    ,0   ,0},   //factor
+							{0    ,400 ,400 ,0},    //p
+							{0    ,100 ,100 ,0}};  //d
 							
 void setConst(int16_t i,int16_t j,int16_t val){
 	_constants[i][j] = val;
@@ -99,7 +99,7 @@ void doFlightControl(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  
 			for (int j=0;j<4;j++){
 				PPMOut[i] += mixer[j][i]*u[j];
 			}
-			PPMOut[i] = PPMOut[i]/100;
+			PPMOut[i] = PPMOut[i]/10;
 			SPEED_LIMITER(PPMOut[i]);
 		}
 	} else {
