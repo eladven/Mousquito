@@ -7,7 +7,7 @@
 #define TIMER0_H
 
 
-#define SYNC_PERIOD  100 // [100 usec]  10000/100 = 100 Hz
+#define SYNC_PERIOD  50 // [100 usec]  10000/100 = 100 Hz
 #define OUTPUT_PERIOD  1000 // [1000 usec]  10000/1000 = 10 Hz
 
 void InitTimer0(void);
