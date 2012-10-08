@@ -9,6 +9,7 @@
 #define twopi 6.283185307 
 #define degToRad 0.01745329252
 #define ANGLELIMITER(x)		if (x<-pi) x += twopi; if (x>pi) x -= twopi;
+const static double  GYRO_FACTOR = degToRad/14.25;
 static double phi=0,teta=0,psi=0;
 
 void resetYaw(){
@@ -23,20 +24,20 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 {
 
 	int16_t * imuBiases;
-	double IMUData[6];
+	int16_t IMUData[6];
 	imuBiases = GetIMUBiases();
 	// subtract the bias from acc and gyro:
 	for (int j=0; j<6; j++)
-		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20.0;
+		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20;
 		
 	IMUData[2] +=256; //need to feal the gravity
 	
 	double accPhi = atan2(IMUData[1],IMUData[2]);
 	double accTeta = atan2(IMUData[0],sqrt(IMUData[1]*IMUData[1]+IMUData[2]*IMUData[2]));
 
-	double p= degToRad*IMUData[3]/14.25;
-	double q= degToRad*IMUData[4]/14.25;
-	double r= degToRad*IMUData[5]/14.25;
+	double p= GYRO_FACTOR*IMUData[3];
+	double q= GYRO_FACTOR*IMUData[4];
+	double r= GYRO_FACTOR*IMUData[5];
 	
 	double sinphi  = sin(phi );
 	double cosphi  = cos(phi );
@@ -47,17 +48,9 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	double dteta = -((q*cosphi)-(r*sinphi));
 	double dpsi  = -(q*sinphi+r*cosphi)/costeta;
 	
-	
-	///////////////////////// testing //////////////////////////////////////////////
-	double ophi= phi,oteta = teta,opsi= psi;
-	
 	phi  = (phi + dphi/SYNC_PERIOD)*0.95 + 0.05*accPhi;		// int type
 	teta = (teta+dteta/SYNC_PERIOD)*0.95 + 0.05*accTeta;		// int type
 	psi  = psi + dpsi/SYNC_PERIOD;								// fsample/2 int type
-	
-	angle[3] = (phi-ophi)*SYNC_PERIOD;
-	angle[4] = (teta-oteta)*SYNC_PERIOD;
-	angle[5] = (psi-opsi)*SYNC_PERIOD;
 	
 	ANGLELIMITER(phi);
 	ANGLELIMITER(teta);
@@ -66,9 +59,9 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	angle[0] = phi;
 	angle[1] = teta;
 	angle[2] = psi;
-//	angle[3] = dphi;
-//	angle[4] = dteta;
-//	angle[5] = dpsi;
+	angle[3] = dphi;
+	angle[4] = dteta;
+	angle[5] = dpsi;
 
 	for(uint8_t i=0;i<3;i++){
 		//setOutputData((angle[i]*180)/3.14,i+9);
