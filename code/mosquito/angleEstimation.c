@@ -24,7 +24,7 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 {
 
 	int16_t * imuBiases;
-	int16_t IMUData[6];
+	double IMUData[6];
 	imuBiases = GetIMUBiases();
 	// subtract the bias from acc and gyro:
 	for (int j=0; j<6; j++)
@@ -35,9 +35,9 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	double accPhi = atan2(IMUData[1],IMUData[2]);
 	double accTeta = atan2(IMUData[0],sqrt(IMUData[1]*IMUData[1]+IMUData[2]*IMUData[2]));
 
-	double p= GYRO_FACTOR*IMUData[3];
-	double q= GYRO_FACTOR*IMUData[4];
-	double r= GYRO_FACTOR*IMUData[5];
+	double p= IMUData[3]*GYRO_FACTOR;
+	double q= IMUData[4]*GYRO_FACTOR;
+	double r= IMUData[5]*GYRO_FACTOR;
 	
 	double sinphi  = sin(phi );
 	double cosphi  = cos(phi );
