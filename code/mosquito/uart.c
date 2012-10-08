@@ -545,6 +545,11 @@ void HendelNewCommand(void)
         PrintEndl() ;     
         SetIMUDataBias();
     }
+	if (strcmp(operands[0],"setgyrobias") ==0){
+	    PrintString("SETGYROBIAS ") ;            
+        PrintEndl() ;     
+        SetGyroDataBias();
+    }
 	if (strcmp(operands[0],"saveimubias") ==0)
     {
         if (numOfOperands==2)

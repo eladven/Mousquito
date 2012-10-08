@@ -12,6 +12,7 @@ void InitIMU(void);
 void GetIMUData(int16_t *IMUData);
 int16_t * GetIMUBiases();
 void SetIMUDataBias();
+void addIMUDataBias();
 
 
 

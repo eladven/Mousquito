@@ -104,6 +104,8 @@ void GetIMUData(int16_t *IMUData)
 }
 
 static uint8_t calibrationCounter = 0;
+static uint8_t gyroCounter = 0;
+
 
 void SetIMUDataBias(){
 	PrintString("calibrating IMU system.");
@@ -116,20 +118,39 @@ void SetIMUDataBias(){
 		 IMUDataBias[j]=0;
 }
 
+void SetGyroDataBias(){
+	PrintString("calibrating Gyro system.");
+ 	PrintEndl();
+	PrintString("The system must be stand still.");
+	PrintEndl();
+	PrintString("calibrate: ");
+	gyroCounter = 20;
+	for (int j=0; j<6; j++)
+		 IMUDataBias[j]=0;
+}
+
 void addIMUDataBias()
 {
-	if (!calibrationCounter)
+	if (calibrationCounter == 0 && gyroCounter == 0)
 		return;
+	if (calibrationCounter-- > 0){
 		
-	for (int j=0; j<6; j++){   
-		IMUDataBias[j] += _IMUData[j];
+		for (int j=0; j<6; j++){   
+			IMUDataBias[j] += _IMUData[j];
+		}
 	}
-	PrintString(".");
+	if (gyroCounter-- > 0){
+		
+		for (int j=3; j<6; j++){   
+			IMUDataBias[j] += _IMUData[j];
+		}
+	}
 	
-	if (--calibrationCounter ==0){
+	if (calibrationCounter ==0 && gyroCounter ==0){
 		PrintString("The system is calibrated.");
 		PrintEndl();
-	}
+	}else 
+		PrintString(".");
 }
 
 int16_t *GetIMUBiases(){
