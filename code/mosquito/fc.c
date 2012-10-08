@@ -68,7 +68,7 @@ uint8_t getControl(){
 
 void fc(int16_t*  IMUData,double*  angle,int16_t*  PPMIn,int16_t*  PPMOut){
 	switch (_control){
-		case RF_CONTROL: doFlightControl(IMUData,angle,PPMIn,PPMOut); break; 
+		case RF_CONTROL: getRCCommands(PPMIn); doFlightControl(IMUData,angle,PPMIn,PPMOut); break; 
 		case MANUEL_CONTROL: break; 
 		case UART_CONTROL: doFlightControl(IMUData,angle,getUartPPMIn(),PPMOut); break; 
 	}
