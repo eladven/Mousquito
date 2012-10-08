@@ -125,7 +125,7 @@ void SetGyroDataBias(){
 	PrintEndl();
 	PrintString("calibrate: ");
 	gyroCounter = 20;
-	for (int j=0; j<6; j++)
+	for (int j=3; j<6; j++)
 		 IMUDataBias[j]=0;
 }
 
@@ -133,14 +133,15 @@ void addIMUDataBias()
 {
 	if (calibrationCounter == 0 && gyroCounter == 0)
 		return;
-	if (calibrationCounter-- > 0){
 		
+	if (calibrationCounter > 0){
+		calibrationCounter--;
 		for (int j=0; j<6; j++){   
 			IMUDataBias[j] += _IMUData[j];
 		}
 	}
-	if (gyroCounter-- > 0){
-		
+	if (gyroCounter > 0){
+		gyroCounter--;
 		for (int j=3; j<6; j++){   
 			IMUDataBias[j] += _IMUData[j];
 		}
