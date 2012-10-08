@@ -58,11 +58,8 @@ int main(void)
 	
 	while (1)   // infinit loop 
 	{
-		int16_t t1,t2;
-		
 		if  (IsNewPeriod())  //if the phase have just changed
 		{
-		   // t1= GetMillis();
 			GetIMUData(IMUData);  // 3 ms
 			setOutputsData(IMUData,0,8);
 			Estimator(IMUData,angle);
@@ -88,15 +85,6 @@ int main(void)
 				LED_OFF(5);
 				LED_OFF(6);
 			}
-
-	
-		/*	t2= GetMillis(); 
-			PrintString("time  ");
-			PrintInt(t1);
-			PrintString("  ");
-			PrintInt(t2);
-			PrintEndl();
-			_delay_ms(1000); */
 		}
 	}
 	return 1;
