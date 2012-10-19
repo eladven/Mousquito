@@ -182,4 +182,12 @@ public class GraphPanel extends JPanel implements DataListener{
 		
 	}
 	
+	public String getLabel(int i){
+		return _chooseData[i].getText();
+	}
+	
+	public int getNumOfLabels(){
+		return _chooseData.length;
+	}
+	
 }

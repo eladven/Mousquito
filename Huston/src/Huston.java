@@ -2,6 +2,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -10,6 +12,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.InternalFrameAdapter;
@@ -31,6 +34,8 @@ public class Huston extends JFrame{
 	private DigitalScope _digitlScope = new DigitalScope();
 	private MotorPanel _motorPanal  = new MotorPanel(_terminal);
 	private ThreeDPanel _tdPanel = new ThreeDPanel();
+	private FileHandler _filehandler = new FileHandler(_commandScreen);
+	
 	
 	//GUI components 
 	private JDesktopPane _deskTop = new JDesktopPane();
@@ -51,6 +56,7 @@ public class Huston extends JFrame{
 		_interapter.addDataListener((DataListener)_commandScreen);
 		_interapter.addDataListener((DataListener)_digitlScope);
 		_interapter.addDataListener((DataListener)_tdPanel);
+		_interapter.addDataListener((DataListener)_filehandler);
 		
 		
 		add(_deskTop);
@@ -59,12 +65,23 @@ public class Huston extends JFrame{
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic('F');
 		
+		JMenuItem fileItem = new JMenuItem("File to save:");
+		fileItem.setMnemonic('f');
+		fileMenu.add(fileItem);
+		fileItem.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				_filehandler.setFileName();				
+			}
+		});
+		
 		JMenuItem exitItem = new JMenuItem("Exit");
 		exitItem.setMnemonic('x');
 		fileMenu.add(exitItem);
 		exitItem.addActionListener( new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				_filehandler.finish();
 				System.exit(0);
 				
 			}
@@ -141,6 +158,23 @@ public class Huston extends JFrame{
 		graphItem.setSelected(true);
 		terminalItem.setSelected(true);
 		
+		JMenu recordMenu = new JMenu("Record");
+		windowMenu.setMnemonic('R');
+		
+		String [] RecordingOptions = {"Record All","Record When Engion on","Stop Recording"};
+		JRadioButtonMenuItem [] recordings = new JRadioButtonMenuItem[RecordingOptions.length];
+		ButtonGroup recordingGroup = new ButtonGroup();
+		RecordMenueHandler recordMenueHandler = new RecordMenueHandler();
+		
+		for (int i=0;i<RecordingOptions.length;i++){
+			recordings[i] = new JRadioButtonMenuItem(RecordingOptions[i]);
+			recordMenu.add(recordings[i]);
+			recordingGroup.add(recordings[i]);
+			recordings[i].addActionListener(recordMenueHandler);
+		}
+		recordings[2].setSelected(true);
+		bar.add(recordMenu);
+		
 		
 	}
 	
@@ -205,6 +239,19 @@ public class Huston extends JFrame{
 					// do nothing.
 				}
 			}
+		}
+	}
+	
+	private class RecordMenueHandler implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String itemLable =  ( (JRadioButtonMenuItem)(e.getSource()) ).getText();
+			if ( itemLable == "Record All" )
+				_filehandler.setRecordingMode(FileHandler.RecodingMode.ALWAYS);
+			if ( itemLable == "Record When Engion on" )
+				_filehandler.setRecordingMode(FileHandler.RecodingMode.ENGION_ON);
+			if ( itemLable == "Stop Recording" )
+				_filehandler.setRecordingMode(FileHandler.RecodingMode.STOP);
 		}
 	}
 	

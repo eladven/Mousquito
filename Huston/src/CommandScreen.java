@@ -28,5 +28,13 @@ public class CommandScreen extends JPanel implements DataListener{
 			_comScreen.appendScreen(operand);
 		
 	}
+	
+	public String getLabel(int i){
+		return _graphPanel.getLabel(i);
+	}
+	
+	public int getNumOfLabels(){
+		return _graphPanel.getNumOfLabels();
+	}
 
 }
