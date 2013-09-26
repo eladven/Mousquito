@@ -55,11 +55,24 @@ int main(void)
     PrintEndl() ;
 	PrintEndl() ;
 	InitIMU(); // use i2c, thus must be after sei instruction.
+	SetIMUDataBias();
+	
+	int32_t elad = 555;
+	int32_t tzipi = 666;
+	elad = elad * tzipi;
+	 PrintInt(elad) ;
+	 elad = elad /100;
+	 PrintEndl() ;
+	 PrintInt(elad);
+	  PrintEndl() ;
 	
 	while (1)   // infinit loop 
 	{
 		if  (IsNewPeriod())  //if the phase have just changed
 		{
+			LED_OFF(5);
+			LED_OFF(4);
+			LED_OFF(6);
 			GetIMUData(IMUData);  // 3 ms
 			setOutputsData(IMUData,0,8);
 			Estimator(IMUData,angle);
