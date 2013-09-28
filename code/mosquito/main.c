@@ -41,6 +41,7 @@ int main(void)
 	TWI_Master_Initialise();
 	InitppmIn();
 	InitppmOut();
+	initFixMath();
 
 	
 	//////////////////////////////////////////////////////////////
@@ -55,6 +56,7 @@ int main(void)
     PrintEndl() ;
 	PrintEndl() ;
 	InitIMU(); // use i2c, thus must be after sei instruction.
+	
 	
 	while (1)   // infinit loop 
 	{
