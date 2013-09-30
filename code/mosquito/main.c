@@ -62,9 +62,17 @@ int main(void)
 	{
 		if  (IsNewPeriod())  //if the phase have just changed
 		{
+			LED_ON(4);
+			LED_ON(5);
+			LED_ON(6);
 			GetIMUData(IMUData);  // 3 ms
 			setOutputsData(IMUData,0,8);
+			
+			
 			Estimator(IMUData,angle);
+		
+		
+			
 			uint8_t rcStatus = GetPPMIn(PPMIn);
 			fc(IMUData,angle,PPMIn,PPMOut);
 			for (int i=0;i<4;i++)
@@ -73,20 +81,12 @@ int main(void)
 			// pass the data to the uart module.
 			setOutputsData(PPMOut,16,19);
 			SyncOut();	
+				LED_OFF(4);
+			LED_OFF(5);
+			LED_OFF(6);
+		
 			
-			if (rcStatus == PPM_IN_OK ){
-				LED_ON(5);
-				LED_OFF(4);
-				LED_OFF(6);
-			} else if (rcStatus == No_RF_SIGNAL){
-				LED_ON(6);
-				LED_OFF(4);
-				LED_OFF(5);
-			} else if (rcStatus == NO_RECIVER_CONECCTION){
-				LED_ON(4);
-				LED_OFF(5);
-				LED_OFF(6);
-			}
+
 		}
 	}
 	return 1;

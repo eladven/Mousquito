@@ -35,7 +35,7 @@ void TWI_Master_Initialise(void)
 	
 	TWSR &= ~(1<<TWPS0); //TWI Prescaler Bits (TWPS=0 -> Prescaler=0) 
 	TWSR &= ~(1<<TWPS1); //
-	TWBR = ((F_CPU/TWI_TWBR)-16)/2; // Set bit rate register (Baudrate). Defined in header file.
+	TWBR = 0x04;//((F_CPU/TWI_TWBR)-16)/2; // Set bit rate register (Baudrate). Defined in header file.
 	
 
 	TWDR = 0xFF; 			// Default content = SDA released.
