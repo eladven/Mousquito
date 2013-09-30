@@ -21,7 +21,7 @@ void updateYaw(int16_t angle){
 	psi += 0.001*angle;
 }
 
-void Estimator(int16_t *IMUDataInt,double *angle)
+void Estimator2(int16_t *IMUDataInt,double *angle)
 {
 
 	int16_t * imuBiases;
@@ -46,7 +46,7 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 }
 
 
-void Estimator2(int16_t *IMUDataInt,double *angle)
+void Estimator(int16_t *IMUDataInt,double *angle)
 {
 
 	int16_t * imuBiases;
@@ -60,6 +60,7 @@ void Estimator2(int16_t *IMUDataInt,double *angle)
 	
 	double accPhi = atan2(IMUData[1],IMUData[2]);
 	double accTeta = atan2(IMUData[0],sqrt(IMUData[1]*IMUData[1]+IMUData[2]*IMUData[2]));
+	double magPsi = atan2(IMUDataInt[7],-IMUDataInt[6]);
 
 	double p= IMUData[3]*GYRO_FACTOR;
 	double q= IMUData[4]*GYRO_FACTOR;
@@ -74,9 +75,13 @@ void Estimator2(int16_t *IMUDataInt,double *angle)
 	double dteta = -((q*cosphi)-(r*sinphi));
 	double dpsi  = -(q*sinphi+r*cosphi)/costeta;
 	
-	phi  = (phi + dphi/SYNC_PERIOD)*0.95 + 0.05*accPhi;		// int type
-	teta = (teta+dteta/SYNC_PERIOD)*0.95 + 0.05*accTeta;		// int type
-	psi  = psi + dpsi/SYNC_PERIOD;								// fsample/2 int type
+	double AccNorm = IMUData[0]*IMUData[0] + IMUData[1]*IMUData[1]+IMUData[2]*IMUData[2];
+	double AccFactor = sqrt( (62500.0 - AccNorm)*(62500.0 - AccNorm));
+	AccFactor = (AccFactor > 5000) ? 0 : (5000 - AccFactor)/5000;
+	
+	phi  = (phi + dphi/SYNC_PERIOD)* (1 - AccFactor*0.05) + AccFactor*0.05*accPhi;		// int type
+	teta = (teta +dteta/SYNC_PERIOD)*(1 - AccFactor*0.05) + AccFactor*0.05*accTeta;		// int type
+	psi  = (psi + dpsi/SYNC_PERIOD)*0.999 + 0.001*magPsi; //psi ;								
 	
 	ANGLELIMITER(phi);
 	ANGLELIMITER(teta);
@@ -90,14 +95,9 @@ void Estimator2(int16_t *IMUDataInt,double *angle)
 	angle[5] = dpsi;
 
 	for(uint8_t i=0;i<3;i++){
-		//setOutputData((angle[i]*180)/3.14,i+9);
-		setOutputData(angle[i]*1000,i+9);
+		setOutputData((angle[i]*180)/3.14,i+9);
 	}
-	
-	setOutputData(angle[3]*1000,24);
-	setOutputData(angle[4]*1000,25);
-	setOutputData(angle[5]*1000,26);
-	
+	setOutputData((AccFactor),8);
 }
 
 
