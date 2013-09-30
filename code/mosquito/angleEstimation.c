@@ -4,6 +4,7 @@
 #include "timer0.h"
 #include "math.h"
 #include "imu.h"
+#include "fixMath.h"
 
 #define pi 3.141592654 
 #define twopi 6.283185307 
@@ -21,6 +22,31 @@ void updateYaw(int16_t angle){
 }
 
 void Estimator(int16_t *IMUDataInt,double *angle)
+{
+
+	int16_t * imuBiases;
+	int16_t IMUData[6];
+	imuBiases = GetIMUBiases();
+	// subtract the bias from acc and gyro:
+	for (int j=0; j<6; j++)
+		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20;
+		
+	IMUData[2] +=256; //need to feal the gravity
+	
+	int16_t accPhi = fixATan2(IMUData[1],IMUData[2]);
+	int16_t accTeta = fixATan2(IMUData[0],intSqrt((int32_t)IMUData[1]*IMUData[1]+(int32_t)IMUData[2]*IMUData[2]));
+
+	
+	angle[0] = accPhi;
+	angle[1] = accTeta;
+
+	for(uint8_t i=0;i<2;i++){
+		setOutputData(angle[i]*180 / PI,i+9);
+	}
+}
+
+
+void Estimator2(int16_t *IMUDataInt,double *angle)
 {
 
 	int16_t * imuBiases;
@@ -73,6 +99,7 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	setOutputData(angle[5]*1000,26);
 	
 }
+
 
 
 

@@ -7,5 +7,7 @@
 
 #define DENOMINATOR 1000
 
+#define PI_DIV_2 1570
+#define PI       3141
 
 #endif 
