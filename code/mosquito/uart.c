@@ -591,17 +591,14 @@ void HendelNewCommand(void)
 		}
 		PrintEndl() ;   
     }
-	if (strcmp(operands[0],"atan") ==0)
+	if (strcmp(operands[0],"sqrt") ==0)
     {
-		int16_t y=-1,x=-1;
-        sscanf(operands[1],"%d",&y);    
-		sscanf(operands[2],"%d",&x);        
-        PrintString("ATAN ") ;  
-		PrintInt(y) ; 
-		PrintString(" ") ;  
-		PrintInt(x) ;   
-		PrintString(": ") ;  
-		PrintInt(fixATan2(y,x)) ;            
+		int16_t x;
+        sscanf(operands[1],"%d",&x);            
+        PrintString("SQRT ") ;  
+		PrintInt(x) ; 
+		PrintString(" : ") ;  
+		PrintInt(intSqrt(x)) ;            
         PrintEndl() ;      
     }
 	
