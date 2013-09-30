@@ -52,7 +52,7 @@ int16_t fixArcTanPositive(int16_t arg){
 	for (int i=0;i<10;i++){
 		if (arg < _arcTanSlopesLimits[i])
 			return (1100 + 50*(i-1) + ((arg - _arcTanSlopesLimits[i-1]) * (int32_t)50) / (_arcTanSlopesLimits[i] - _arcTanSlopesLimits[i-1]) );
-	}
+	} 
 	return PI_DIV_2; 
 }
 
@@ -80,10 +80,10 @@ int16_t fixATan2(int16_t y,int16_t x){
 		return fixArcTan(fixDiv(y,x)) + PI;
 }
 
-int16_t intSqrt(int32_t arg){   
-	int16_t x = 1;
+int16_t intSqrt(int32_t arg){  
+	int32_t x = 1;
 	for (int i=0;i<20;i++){
-		int16_t new_x = (x + arg/x) / 2;
+		int32_t new_x = (x + arg/x) / 2;
 		if (x == new_x)
 			return x;
 		x = new_x;
