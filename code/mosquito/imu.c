@@ -88,11 +88,9 @@ void GetIMUData(int16_t *IMUData)
 	
 	TWI_Read_Data_From_Buffer(messageBuf, 8 );
 	
-	if (messageBuf[1] == 0x01) {  //take the data only if the data is redy
-		IMUData[6] =   (messageBuf[3] << 8 ) | messageBuf[2] ; // two's compliment of gyroX[msb](hx[7:0]) # accX[lsb](hx[7:6])
-		IMUData[7] =   (messageBuf[5] << 8 ) | messageBuf[4] ; 
-		IMUData[8] =   (messageBuf[7] << 8 ) | messageBuf[6] ; 
-	}
+	IMUData[6] =   (messageBuf[3] << 8 ) | messageBuf[2] ; // two's compliment of gyroX[msb](hx[7:0]) # accX[lsb](hx[7:6])
+	IMUData[7] =   (messageBuf[5] << 8 ) | messageBuf[4] ; 
+	IMUData[8] =   (messageBuf[7] << 8 ) | messageBuf[6] ; 
 	
 	messageBuf[0] = (TWI_magnetometerAdd<<1) | (TWI_WRITE); // for next step: change magneto mode to single messurment
 	messageBuf[1] = 0x0A;  	
