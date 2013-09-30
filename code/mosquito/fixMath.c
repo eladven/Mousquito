@@ -2,10 +2,6 @@
 #include "main.h"
 #include "math.h"
 
-
-#define PI_DIV_2 1570
-#define PI       3141
-
 int16_t  _arcTan[1900];
 uint16_t  _arcTanSlopesLimits[10];
 
@@ -67,9 +63,7 @@ int16_t fixArcTan(int16_t arg){
 }
 
 int16_t fixATan2(int16_t y,int16_t x){   
-	if (x == 0){
-		PrintString(" x = 0") ;      
-        PrintEndl() ;    
+	if (x == 0){   
 		if (y > 0) 
 			return PI_DIV_2;
 		else if (y < 0)
@@ -85,3 +79,14 @@ int16_t fixATan2(int16_t y,int16_t x){
 	// x < 0, y > 0
 		return fixArcTan(fixDiv(y,x)) + PI;
 }
+
+int16_t intSqrt(int32_t arg){   
+	int16_t x = 1;
+	for (int i=0;i<20;i++){
+		int16_t new_x = (x + arg/x) / 2;
+		if (x == new_x)
+			return x;
+		x = new_x;
+	}
+}
+
