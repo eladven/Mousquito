@@ -57,6 +57,8 @@ int main(void)
 	PrintEndl() ;
 	InitIMU(); // use i2c, thus must be after sei instruction.
 	
+	SetIMUDataBias();
+	
 	
 	while (1)   // infinit loop 
 	{
