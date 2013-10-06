@@ -10,7 +10,7 @@
 #define twopi 6.283185307 
 #define degToRad 0.01745329252
 #define ANGLELIMITER(x)		if (x<-pi) x += twopi; if (x>pi) x -= twopi;
-const static double  GYRO_FACTOR = degToRad/14.25;
+const static double  GYRO_FACTOR = 0.0001*degToRad/14.25;
 static double phi=0,teta=0,psi=0;
 
 void resetYaw(){
@@ -29,7 +29,7 @@ void Estimator2(int16_t *IMUDataInt,double *angle)
 	imuBiases = GetIMUBiases();
 	// subtract the bias from acc and gyro:
 	for (int j=0; j<6; j++)
-		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20;
+		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20.0;
 		
 	IMUData[2] +=256; //need to feal the gravity
 	
@@ -54,7 +54,7 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	imuBiases = GetIMUBiases();
 	// subtract the bias from acc and gyro:
 	for (int j=0; j<6; j++)
-		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20;
+		IMUData[j]=IMUDataInt[j] - imuBiases[j]/20.0;
 		
 	IMUData[2] +=256; //need to feal the gravity
 	
@@ -77,11 +77,11 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	
 	double AccNorm = IMUData[0]*IMUData[0] + IMUData[1]*IMUData[1]+IMUData[2]*IMUData[2];
 	double AccFactor = sqrt( (62500.0 - AccNorm)*(62500.0 - AccNorm));
-	AccFactor = (AccFactor > 5000) ? 0 : (5000 - AccFactor)/5000;
+	AccFactor = (AccFactor > 1500) ? 0 : (1500 - AccFactor)/1500;
 	
-	phi  = (phi + dphi/SYNC_PERIOD)* (1 - AccFactor*0.05) + AccFactor*0.05*accPhi;		// int type
-	teta = (teta +dteta/SYNC_PERIOD)*(1 - AccFactor*0.05) + AccFactor*0.05*accTeta;		// int type
-	psi  = (psi + dpsi/SYNC_PERIOD)*0.999 + 0.001*magPsi; //psi ;								
+	phi  = (phi + dphi*SYNC_PERIOD)* (1 - AccFactor*0.1) + AccFactor*0.1*accPhi;		// int type
+	teta = (teta +dteta*SYNC_PERIOD)*(1 - AccFactor*0.1) + AccFactor*0.1*accTeta;		// int type
+	psi  = (psi + dpsi*SYNC_PERIOD)*0.9999 + 0.0001*magPsi; //psi ;								
 	
 	ANGLELIMITER(phi);
 	ANGLELIMITER(teta);
@@ -97,7 +97,6 @@ void Estimator(int16_t *IMUDataInt,double *angle)
 	for(uint8_t i=0;i<3;i++){
 		setOutputData((angle[i]*180)/3.14,i+9);
 	}
-	setOutputData((AccFactor),8);
 }
 
 
